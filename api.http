@@ -1,0 +1,8 @@
+
+# return all equipments
+GET http://localhost:3000/equipment
+
+# reeturn PG Charing cross equipments
+GET http://localhost:3000/gyms/31/equipment
+
+

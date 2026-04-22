@@ -1,0 +1,993 @@
+[
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Chest Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Pectoral Fly",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Converging Chest Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Shoulder Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Lateral Raise",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Rear Delt Fly",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Converging Shoulder Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Lat Pulldown",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Seated Row",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Diverging Lat Pulldown",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Diverging Seated Row",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Arm Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Triceps Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Tricep Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Abdominal",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Abdominal Crunch",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Back Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Rotary Torso",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Dip / Chin Assist",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Leg Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Leg Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Seated Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Prone Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Hip Adductor",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Vertical Bench Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Supine Bench Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Incline Bench Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Vertical Decline Bench Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Shoulder Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Lat Pulldown",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Seated Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "T-bar Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Incline Lever Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "High Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Low Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Elevated Biceps Curl",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Kneeling Leg Curl",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Reclining Leg Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Pendulum Squat",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Belt Squat",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Standing Hip Thrust",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Ab Crunch Bench",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Smith Machine",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "45-degree Leg Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Hack Squat",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Standing Calf",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Seated Calf",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Glute Trainer",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Squat / Lunge",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Reverse Back Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Pendulum Squat",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Abdominal Crunch",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Arm Curl",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Chest Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Extreme Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Incline Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Lat Pulldown",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Leg Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Leg Ext/ Leg Curl Combo",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Leg Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Low Back Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Prone Leg Curl",
+		"type": "plate_loaded"
+	},
+
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Pendulum Squat",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Abdominal Crunch",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Arm Curl",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Chest Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Extreme Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Incline Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Lat Pulldown",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Leg Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Leg Ext/ Leg Curl Combo",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Leg Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Low Back Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Prone Leg Curl",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Seated Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Shoulder Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Tricep Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Pulldown",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": null,
+		"name": "Hack Squat",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Abdominal Crunch",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Arm Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Chest Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Incline Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Inner Thigh",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Inner/Outer Thigh",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Lat Pulldown",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Lateral Raise",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Leg Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Leg Extension/ Leg Curl Combo",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Leg Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Low Back Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Multi-Hip",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Outer Thigh",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Pec Fly",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Pec/Rear Delt",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Prone Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Pullover",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Rotary Torso",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Seated Calf Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Seated Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Seated Pushdown",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Seated Row",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Shoulder Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Tricep Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Abdominal Crunch",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Arm Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Chest Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Lat Pulldown",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Leg Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Leg Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Low Back Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Prone Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Seated Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Seated Row",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Shoulder Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Prime",
+		"series": "Evolution",
+		"name": "Tricep Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Converging Chest Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Pec Fly / Rear Delt",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Converging Shoulder Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Diverging Lat Pulldown",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Diverging Seated Row",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Bicep Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Triceps Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Back Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Abdominal",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Leg Press / Calf Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Leg Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Seated Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Hip Abductor / Adductor",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Glute",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Multi Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Lat Pulldown / Seated Row",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Bicep / Tricep",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Ab / Low Back",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Chin / Dip Assist",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "Leg Extension / Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "MD Adjustable Pulley",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "MD Leg Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Versa",
+		"name": "MD Leg Extension / Leg Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Leg Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Leg Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Hip Adduction/Abduction",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Compound Row",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Mid Row",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Incline Press",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Vertical Chest",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Pec Fly",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Rotary Torso",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Seated Dip",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Triceps Extension",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Biceps Curl",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Weight Assist Chin/Dip",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Abdominal",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "Nitro",
+		"name": "Low Back",
+		"type": "pin_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Leg Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Leg Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Lying Hamstring Curl",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Seated Calf Raise",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Lat Pulldown",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Compound Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "T-bar Row",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Incline Press",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Triceps Extension",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Bicep Curl",
+		"type": "plate_loaded"
+	},
+	{
+		"brand": "Nautilus",
+		"series": "XPLoad",
+		"name": "Seated Dip",
+		"type": "plate_loaded"
+	}
+]

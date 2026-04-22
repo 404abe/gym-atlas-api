@@ -1,0 +1,42 @@
+[
+    {
+      "name": "PureGym Glasgow Charing Cross",
+      "slug": "puregym-glasgow-charing-cross",
+      "city": "Glasgow",
+      "country": "UK",
+      "latitude": 55.8642,
+      "longitude": -4.2651
+    },
+    {
+      "name": "PureGym Edinburgh City Centre",
+      "slug": "puregym-edinburgh-city-centre",
+      "city": "Edinburgh",
+      "country": "UK",
+      "latitude": 55.9533,
+      "longitude": -3.1883
+    },
+    {
+      "name": "JD Gyms Glasgow South",
+      "slug": "jd-gyms-glasgow-south",
+      "city": "Glasgow",
+      "country": "UK",
+      "latitude": 55.8340,
+      "longitude": -4.2640
+    },
+    {
+      "name": "The Gym Group Edinburgh Meadowbank",
+      "slug": "the-gym-group-edinburgh-meadowbank",
+      "city": "Edinburgh",
+      "country": "UK",
+      "latitude": 55.9519,
+      "longitude": -3.1600
+    },
+    {
+      "name": "Nuffield Health Glasgow Central",
+      "slug": "nuffield-health-glasgow-central",
+      "city": "Glasgow",
+      "country": "UK",
+      "latitude": 55.8609,
+      "longitude": -4.2514
+    }
+  ]
