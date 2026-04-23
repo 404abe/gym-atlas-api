@@ -14,4 +14,10 @@ The platform shares this data through a REST API, allowing developers to build a
 - scalable foundation for gym discovery and analytics
 
 # Want to Contribute?
-refer to CONTRIBUTING.md.
+refer to [CONTRIBUTING.md](/docs/CONTRIBUTING.md).
+
+
+# Feature Plans
+
+- add webapp/api so community can add data about their gyms.
+- create gym app do make use of data. 
