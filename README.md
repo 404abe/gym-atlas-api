@@ -1,23 +1,44 @@
-# Gym Data Engine 🏋️
+# GymAtlas 🏋️
 
-Gym Data Engine is a data platform for modelling gym equipment across locations. It provides structured data on machine brands, product lines, and real-world gym inventories, enabling queries such as where specific machines are located and how equipment varies between gyms.
+Gym Data Engine is an open-source data platform designed to map gym equipment across locations. It leverages crowd-sourced data to build a structured database of machines in real gyms, enabling users to query where specific equipment is available and discover new training environments.
 
-The platform shares this data through a REST API, allowing developers to build applications for gym discovery, equipment comparison, and training analytics.
+The platform exposes this data through a REST API, allowing developers to build applications for gym discovery, equipment comparison, and training analytics.
+
+> Built to answer: *where can I find this machine?*
+
+---
 
 # Features
 
-- structured equipment database (brands, series, machine types)
-- gym ↔ equipment mapping
+- Structured equipment database (brands, series, machine types)
+- Gym ↔ equipment mapping with machine counts
 - REST API for querying gyms and equipment
-- seeded dataset with real-world machine distributions
-- relational PostgreSQL schema
-- scalable foundation for gym discovery and analytics
+- Seeded dataset with real-world machine distributions
+- Relational PostgreSQL schema
+- Scalable foundation for gym discovery and analytics
 
-# Want to Contribute?
-refer to [CONTRIBUTING.md](/docs/CONTRIBUTING.md).
+---
 
+## 🤝 Contributing
 
-# Feature Plans
+refer to [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for guidelines.
 
-- add webapp/api so community can add data about their gyms.
-- create gym app do make use of data. 
+---
+
+## Future Plans
+
+GymAtlas is being built as the foundation for a larger ecosystem of gym-focused tools.
+
+### Data Platform Expansion
+- Enable community contributions to expand gym and equipment data
+- Improve data validation and consistency
+- Introduce equipment ratings and community insights
+
+### Discovery & Search
+- Advanced search (by machine, brand, location)
+- Location-based queries (e.g. nearest gyms with specific equipment)
+
+### 📱 Full Application
+- Build a web interface for managing and exploring gym data
+- Develop a mobile app for gym discovery and comparison
+- Personalised tracking of favourite machines and gyms
