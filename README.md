@@ -1,4 +1,10 @@
 # GymAtlas 🏋️
+[![Node.js](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/postgresql-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Express](https://img.shields.io/badge/express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](#)
+[![Status](https://img.shields.io/badge/status-active--development-orange?style=for-the-badge)](#)
 
 Gym Data Engine is an open-source data platform designed to map gym equipment across locations. It leverages crowd-sourced data to build a structured database of machines in real gyms, enabling users to query where specific equipment is available and discover new training environments.
 
