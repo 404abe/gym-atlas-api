@@ -1,8 +1,11 @@
-
 # return all equipments
 GET http://localhost:3000/equipment
 
-# reeturn PG Charing cross equipments
+###
+
+# return equipment at Charing Cross
 GET http://localhost:3000/gyms/31/equipment
+GET curl http://localhost:3000/gyms/31/equipment | jq
+
 
 
