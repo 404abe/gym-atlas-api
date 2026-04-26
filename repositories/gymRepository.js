@@ -52,9 +52,9 @@ ORDER BY total_equipment DESC;
 	return result.rows;
 };
 
+// btw theere has to be a way to not have to write this in every file
 module.exports = {
 	getGymEquipment,
 	addGymEquipment,
-
 	getGymStats
 };

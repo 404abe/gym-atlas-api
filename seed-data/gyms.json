@@ -1,42 +1,70 @@
 [
-    {
-      "name": "PureGym Glasgow Charing Cross",
-      "slug": "puregym-glasgow-charing-cross",
-      "city": "Glasgow",
-      "country": "UK",
-      "latitude": 55.8642,
-      "longitude": -4.2651
-    },
-    {
-      "name": "PureGym Edinburgh City Centre",
-      "slug": "puregym-edinburgh-city-centre",
-      "city": "Edinburgh",
-      "country": "UK",
-      "latitude": 55.9533,
-      "longitude": -3.1883
-    },
-    {
-      "name": "JD Gyms Glasgow South",
-      "slug": "jd-gyms-glasgow-south",
-      "city": "Glasgow",
-      "country": "UK",
-      "latitude": 55.8340,
-      "longitude": -4.2640
-    },
-    {
-      "name": "The Gym Group Edinburgh Meadowbank",
-      "slug": "the-gym-group-edinburgh-meadowbank",
-      "city": "Edinburgh",
-      "country": "UK",
-      "latitude": 55.9519,
-      "longitude": -3.1600
-    },
-    {
-      "name": "Nuffield Health Glasgow Central",
-      "slug": "nuffield-health-glasgow-central",
-      "city": "Glasgow",
-      "country": "UK",
-      "latitude": 55.8609,
-      "longitude": -4.2514
-    }
-  ]
+	{
+		"name": "PureGym Glasgow Charing Cross",
+		"slug": "puregym-glasgow-charing-cross",
+		"city": "Glasgow",
+		"country": "UK",
+		"latitude": 55.8642,
+		"longitude": -4.2651
+	},
+	{
+		"name": "PureGym Edinburgh City Centre",
+		"slug": "puregym-edinburgh-city-centre",
+		"city": "Edinburgh",
+		"country": "UK",
+		"latitude": 55.9533,
+		"longitude": -3.1883
+	},
+	{
+		"name": "JD Gyms Glasgow South",
+		"slug": "jd-gyms-glasgow-south",
+		"city": "Glasgow",
+		"country": "UK",
+		"latitude": 55.834,
+		"longitude": -4.264
+	},
+	{
+		"name": "The Gym Group Edinburgh Meadowbank",
+		"slug": "the-gym-group-edinburgh-meadowbank",
+		"city": "Edinburgh",
+		"country": "UK",
+		"latitude": 55.9519,
+		"longitude": -3.16
+	},
+	{
+		"name": "Nuffield Health Glasgow Central",
+		"slug": "nuffield-health-glasgow-central",
+		"city": "Glasgow",
+		"country": "UK",
+		"latitude": 55.8609,
+		"longitude": -4.2514
+	},
+
+	{
+		"name": "Prestige Fitness Glasgow",
+		"slug": "prestige-fitness-glasgow",
+		"address": "219 Govan Rd, Glasgow G51 1HJ",
+		"city": "Glasgow",
+		"country": "UK",
+		"latitude": 55.8539,
+		"longitude": -4.2918
+	},
+	{
+		"name": "Summit Fitness Edinburgh",
+		"slug": "summit-fitness-edinburgh",
+		"address": "28 Beaverbank Pl, Edinburgh EH7 4ET",
+		"city": "Edinburgh",
+		"country": "UK",
+		"latitude": 55.9646,
+		"longitude": -3.1948
+	},
+	{
+		"name": "MuscleHut Glasgow",
+		"slug": "musclehut-glasgow",
+		"address": "70 Hillington Rd S, Glasgow G52 2AA",
+		"city": "Glasgow",
+		"country": "UK",
+		"latitude": 55.8504,
+		"longitude": -4.3562
+	}
+]

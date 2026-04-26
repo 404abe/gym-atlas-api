@@ -7,6 +7,10 @@ app.use(express.json());
 const gymRoutes = require('./routes/gymRoutes');
 app.use('/gyms', gymRoutes);
 
+const equipmentRoutes = require('./routes/equipmentRoutes');
+
+app.use('/equipment', equipmentRoutes);
+
 app.listen(3000, () => {
   console.log('Server running on port 3000');
 });
