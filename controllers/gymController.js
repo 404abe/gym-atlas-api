@@ -35,8 +35,8 @@ const addGymEquipment = async (req, res) => {
 			data: result
 		});
 	} catch (err) {
-		console.error('FULL ERROR:', err);
-		res.status(500).json({ error: 'Failed to fetch gym equipment' });
+		console.error('POST ERROR:', err);
+		res.status(500).json({ error: 'Failed to add gym equipment' });
 	}
 };
 

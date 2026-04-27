@@ -22,6 +22,10 @@ const getGymEquipment = async (gymId) => {
 
 // INSERT gym equipment
 const addGymEquipment = async (gymId, equipmentId, quantity, notes) => {
+	if (!equipmentId || !quantity) {
+		throw new Error('equipmentId and quantity required');
+	}
+
 	const result = await pool.query(
 		`
 		INSERT INTO gym_equipment (gym_id, equipment_id, quantity, notes)
@@ -29,8 +33,7 @@ const addGymEquipment = async (gymId, equipmentId, quantity, notes) => {
 		ON CONFLICT (gym_id, equipment_id)
 		DO UPDATE SET
 			quantity = EXCLUDED.quantity,
-			notes = EXCLUDED.notes,
-			updated_at = NOW()
+			notes = EXCLUDED.notes
 		RETURNING *
 		`,
 		[gymId, equipmentId, quantity, notes]
@@ -43,18 +46,16 @@ const addGymEquipment = async (gymId, equipmentId, quantity, notes) => {
 
 const getGymStats = async () => {
 	const result = await pool.query(`
-  
-SELECT 
-  g.id,
-  g.name,
-  COALESCE(SUM(ge.count), 0)::INT AS total_equipment,
-  COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines
-FROM gyms g
-LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
-GROUP BY g.id, g.name
-ORDER BY total_equipment DESC;
-  
-    `);
+		SELECT 
+			g.id,
+			g.name,
+			COALESCE(SUM(ge.quantity), 0)::INT AS total_equipment,
+			COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines
+		FROM gyms g
+		LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
+		GROUP BY g.id, g.name
+		ORDER BY total_equipment DESC;
+	`);
 
 	return result.rows;
 };
