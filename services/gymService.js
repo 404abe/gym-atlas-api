@@ -10,8 +10,13 @@ const getGymStats = async () => {
 	return await gymRepo.getGymStats();
 };
 
-const addGymEquipment = async (gymId, equipmentId, count, notes) => {
-	return await gymRepo.addGymEquipment(gymId, equipmentId, count, notes);
+const addGymEquipment = async (gymId, equipmentId, quantity, notes) => {
+	return await gymRepo.addGymEquipment(
+		gymId,
+		equipmentId,
+		quantity,
+		notes
+	);
 };
 
 module.exports = {

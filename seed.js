@@ -61,9 +61,13 @@ async function linkGymEquipment() {
 			const randomEq = equipment[Math.floor(Math.random() * equipment.length)];
 
 			await pool.query(
-				`INSERT INTO gym_equipment (gym_id, equipment_id, count)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (gym_id, equipment_id) DO NOTHING`,
+				`
+				INSERT INTO gym_equipment (gym_id, equipment_id, quantity)
+				VALUES ($1, $2, $3)
+				ON CONFLICT (gym_id, equipment_id)
+				DO UPDATE SET
+				  quantity = EXCLUDED.quantity
+				`,
 				[gym.id, randomEq.id, Math.ceil(Math.random() * 3)]
 			);
 		}

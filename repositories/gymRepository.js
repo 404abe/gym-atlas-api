@@ -4,11 +4,16 @@ const pool = require('../db');
 const getGymEquipment = async (gymId) => {
 	const result = await pool.query(
 		`
-    SELECT e.brand, e.series, e.name, ge.count
-    FROM gym_equipment ge
-    JOIN equipment e ON e.id = ge.equipment_id
-    WHERE ge.gym_id = $1
-    `,
+		SELECT 
+			e.brand,
+			e.series,
+			e.name,
+			ge.quantity
+		FROM gym_equipment ge
+		JOIN equipment e ON ge.equipment_id = e.id
+		WHERE ge.gym_id = $1
+		ORDER BY e.brand, e.name
+		`,
 		[gymId]
 	);
 
@@ -16,17 +21,19 @@ const getGymEquipment = async (gymId) => {
 };
 
 // INSERT gym equipment
-const addGymEquipment = async (gymId, equipmentId, count, notes) => {
+const addGymEquipment = async (gymId, equipmentId, quantity, notes) => {
 	const result = await pool.query(
 		`
-    INSERT INTO gym_equipment (gym_id, equipment_id, count, notes)
-    VALUES ($1, $2, $3, $4)
-    ON CONFLICT (gym_id, equipment_id)
-    DO UPDATE SET count = EXCLUDED.count,
-                  notes = EXCLUDED.notes
-    RETURNING *
-    `,
-		[gymId, equipmentId, count, notes]
+		INSERT INTO gym_equipment (gym_id, equipment_id, quantity, notes)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (gym_id, equipment_id)
+		DO UPDATE SET
+			quantity = EXCLUDED.quantity,
+			notes = EXCLUDED.notes,
+			updated_at = NOW()
+		RETURNING *
+		`,
+		[gymId, equipmentId, quantity, notes]
 	);
 
 	return result.rows[0];

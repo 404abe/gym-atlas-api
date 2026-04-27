@@ -1,0 +1,3 @@
+SELECT gym_id, SUM(quantity)
+FROM gym_equipment
+GROUP BY gym_id;
