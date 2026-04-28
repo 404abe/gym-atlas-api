@@ -1,3 +1,18 @@
 SELECT gym_id, SUM(quantity)
 FROM gym_equipment
 GROUP BY gym_id;
+
+
+// get the equipemnt name, quantity, eauipment id
+
+SELECT 
+  g.name AS gym_name,
+  ge.gym_id,
+  ge.equipment_id,
+  e.name AS equipment_name,
+  ge.quantity,
+  ge.notes
+FROM gym_equipment ge
+JOIN equipment e ON ge.equipment_id = e.id
+JOIN gyms g ON ge.gym_id = g.id
+WHERE ge.gym_id = 2;

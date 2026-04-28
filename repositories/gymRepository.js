@@ -20,18 +20,14 @@ const getGymEquipment = async (gymId) => {
 	return result.rows;
 };
 
-// INSERT gym equipment
+// ADD / UPSERT
 const addGymEquipment = async (gymId, equipmentId, quantity, notes) => {
-	if (!equipmentId || !quantity) {
-		throw new Error('equipmentId and quantity required');
-	}
-
 	const result = await pool.query(
 		`
 		INSERT INTO gym_equipment (gym_id, equipment_id, quantity, notes)
 		VALUES ($1, $2, $3, $4)
 		ON CONFLICT (gym_id, equipment_id)
-		DO UPDATE SET
+		DO UPDATE SET 
 			quantity = EXCLUDED.quantity,
 			notes = EXCLUDED.notes
 		RETURNING *
@@ -42,10 +38,10 @@ const addGymEquipment = async (gymId, equipmentId, quantity, notes) => {
 	return result.rows[0];
 };
 
-//
-
+// STATS
 const getGymStats = async () => {
-	const result = await pool.query(`
+	const result = await pool.query(
+		`
 		SELECT 
 			g.id,
 			g.name,
@@ -54,15 +50,61 @@ const getGymStats = async () => {
 		FROM gyms g
 		LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
 		GROUP BY g.id, g.name
-		ORDER BY total_equipment DESC;
-	`);
+		ORDER BY total_equipment DESC
+		`
+	);
 
 	return result.rows;
 };
 
-// btw theere has to be a way to not have to write this in every file
+// DECREMENT
+const decrementGymEquipment = async (gymId, equipmentId) => {
+	const result = await pool.query(
+		`
+		UPDATE gym_equipment
+		SET quantity = quantity - 1
+		WHERE gym_id = $1
+		AND equipment_id = $2
+		AND quantity > 1
+		RETURNING *
+		`,
+		[gymId, equipmentId]
+	);
+
+	return result.rows[0] || null;
+};
+
+// DELETE (when quantity = 1)
+const deleteGymEquipment = async (gymId, equipmentId) => {
+	const result = await pool.query(
+		`
+		DELETE FROM gym_equipment
+		WHERE gym_id = $1
+		AND equipment_id = $2
+		AND quantity = 1
+		RETURNING *
+		`,
+		[gymId, equipmentId]
+	);
+
+	return result.rows[0] || null;
+};
+
+// GET equipment (for enrichment)
+const getEquipmentById = async (id) => {
+	const result = await pool.query(
+		`SELECT * FROM equipment WHERE id = $1`,
+		[id]
+	);
+
+	return result.rows[0] || null;
+};
+
 module.exports = {
 	getGymEquipment,
 	addGymEquipment,
-	getGymStats
+	getGymStats,
+	decrementGymEquipment,
+	deleteGymEquipment,
+	getEquipmentById
 };

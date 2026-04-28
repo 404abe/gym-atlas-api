@@ -3,8 +3,12 @@ GET {{baseUrl}}/equipment
 
 ###
 
-GET {{baseUrl}}/gyms/1/equipment
+GET {{baseUrl}}/gyms/2/equipment
 
 ###
 
 GET {{baseUrl}}/equipment/matrix-aura-diverging-seated-row/gyms
+
+###
+
+GET {{baseUrl}}/gyms/stats
