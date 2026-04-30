@@ -43,14 +43,16 @@ const getGymStats = async () => {
 	const result = await pool.query(
 		`
 		SELECT 
-			g.id,
-			g.name,
-			COALESCE(SUM(ge.quantity), 0)::INT AS total_equipment,
-			COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines
-		FROM gyms g
-		LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
-		GROUP BY g.id, g.name
-		ORDER BY total_equipment DESC
+  g.id,
+  g.name,
+  g.latitude AS lat,
+  g.longitude AS lng,
+  COALESCE(SUM(ge.quantity), 0)::INT AS total_equipment,
+  COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines
+FROM gyms g
+LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
+GROUP BY g.id, g.name, g.latitude, g.longitude
+ORDER BY total_equipment DESC;
 		`
 	);
 
@@ -92,10 +94,7 @@ const deleteGymEquipment = async (gymId, equipmentId) => {
 
 // GET equipment (for enrichment)
 const getEquipmentById = async (id) => {
-	const result = await pool.query(
-		`SELECT * FROM equipment WHERE id = $1`,
-		[id]
-	);
+	const result = await pool.query(`SELECT * FROM equipment WHERE id = $1`, [id]);
 
 	return result.rows[0] || null;
 };

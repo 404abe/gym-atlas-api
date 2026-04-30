@@ -12,3 +12,9 @@ GET {{baseUrl}}/equipment/matrix-aura-diverging-seated-row/gyms
 ###
 
 GET {{baseUrl}}/gyms/stats
+// curl http://localhost:3000/gyms/stats | jq
+
+
+###
+
+http://localhost:3000/gyms/stats
