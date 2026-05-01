@@ -17,18 +17,28 @@ const getGymEquipment = async (req, res) => {
 	}
 };
 
+// POST gym
+const createGym = async (req, res) => {
+	try {
+		const { name, latitude, longitude } = req.body;
+		const gym = await gymService.createGym(name, latitude, longitude);
+		res.json({
+			success: true,
+			data: gym
+		});
+	} catch (err) {
+		console.error('CREATE GYM ERROR:', err);
+		res.status(500).json({ error: 'Failed to create gym' });
+	}
+};
+
 // POST /gyms/:gymId/equipment
 const addGymEquipment = async (req, res) => {
 	try {
 		const { gymId } = req.params;
 		const { equipment_id, quantity, notes } = req.body;
 
-		const result = await gymService.addGymEquipment(
-			gymId,
-			equipment_id,
-			quantity,
-			notes
-		);
+		const result = await gymService.addGymEquipment(gymId, equipment_id, quantity, notes);
 
 		res.json({
 			success: true,
@@ -57,10 +67,7 @@ const removeGymEquipment = async (req, res) => {
 	try {
 		const { gymId, equipmentId } = req.params;
 
-		const result = await gymService.removeGymEquipment(
-			Number(gymId),
-			Number(equipmentId)
-		);
+		const result = await gymService.removeGymEquipment(Number(gymId), Number(equipmentId));
 
 		if (!result) {
 			return res.status(404).json({
@@ -79,9 +86,7 @@ const removeGymEquipment = async (req, res) => {
 			success: true,
 			action: result.action,
 			message:
-				result.action === 'decremented'
-					? `${name} quantity decreased`
-					: `${name} removed from gym`,
+				result.action === 'decremented' ? `${name} quantity decreased` : `${name} removed from gym`,
 			data: result.row
 		});
 	} catch (err) {
@@ -94,5 +99,6 @@ module.exports = {
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,
-	removeGymEquipment
+	removeGymEquipment,
+	createGym
 };

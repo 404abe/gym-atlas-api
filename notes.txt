@@ -15,4 +15,4 @@ SELECT
 FROM gym_equipment ge
 JOIN equipment e ON ge.equipment_id = e.id
 JOIN gyms g ON ge.gym_id = g.id
-WHERE ge.gym_id = 2;
+WHERE ge.gym_id = 6;

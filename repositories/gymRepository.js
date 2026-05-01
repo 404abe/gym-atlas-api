@@ -1,13 +1,30 @@
 const pool = require('../db');
 
+const createGym = async (name, latitude, longitude) => {
+	const slug = name.toLowerCase().replace(/\s+/g, '-');
+
+	const result = await pool.query(
+		`
+		INSERT INTO gyms (name, slug, latitude, longitude)
+		VALUES ($1, $2, $3, $4)
+		RETURNING *
+		`,
+		[name, slug, latitude, longitude]
+	);
+
+	return result.rows[0];
+};
+
 // GET gym equipment
 const getGymEquipment = async (gymId) => {
 	const result = await pool.query(
 		`
 		SELECT 
+			e.id AS equipment_id,
 			e.brand,
 			e.series,
 			e.name,
+			CONCAT_WS(' ', e.brand, e.series, e.name) AS full_name,
 			ge.quantity
 		FROM gym_equipment ge
 		JOIN equipment e ON ge.equipment_id = e.id
@@ -105,5 +122,6 @@ module.exports = {
 	getGymStats,
 	decrementGymEquipment,
 	deleteGymEquipment,
-	getEquipmentById
+	getEquipmentById,
+	createGym
 };
