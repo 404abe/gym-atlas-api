@@ -50,8 +50,54 @@ const getEquipmentBySlug = async (slug) => {
 	return result.rows[0];
 };
 
+const rateEquipment = async (userId, equipmentId, rating) => {
+	const result = await pool.query(
+		`
+	INSERT INTO equipment_ratings (user_id, equipment_id, rating)
+	VALUES ($1, $2, $3)
+	ON CONFLICT (user_id, equipment_id)
+	DO UPDATE SET rating = EXCLUDED.rating
+	RETURNING *
+	`,
+		[userId, equipmentId, rating]
+	);
+
+	return result.rows[0];
+};
+
+const favouriteEquipment = async (userId, equipmentId) => {
+	const result = await pool.query(
+		`
+		INSERT INTO equipment_favourites (user_id, equipment_id)
+		VALUES ($1, $2)
+		ON CONFLICT DO NOTHING
+		RETURNING *
+		`,
+		[userId, equipmentId]
+	);
+
+	return result.rows[0] || null;
+};
+
+const removeFavouriteEquipment = async (userId, equipmentId) => {
+	const result = await pool.query(
+		`
+		DELETE FROM equipment_favourites
+		WHERE user_id = $1 AND equipment_id = $2
+		RETURNING *
+		`,
+		[userId, equipmentId]
+	);
+
+	return result.rows[0] || null;
+};
+
 module.exports = {
 	getGymsByEquipmentSlug,
 	getEquipmentBySlug,
-	createEquipment
+	createEquipment,
+	favouriteEquipment,
+	rateEquipment,
+	removeFavouriteEquipment,
+	favouriteEquipment
 };

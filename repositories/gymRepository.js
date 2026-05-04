@@ -9,6 +9,7 @@ const createGym = async (name, latitude, longitude) => {
 		VALUES ($1, $2, $3, $4)
 		RETURNING *
 		`,
+		// array bellow are the values that go into, $1,$2 etc.
 		[name, slug, latitude, longitude]
 	);
 
@@ -59,16 +60,24 @@ const addGymEquipment = async (gymId, equipmentId, quantity, notes) => {
 const getGymStats = async () => {
 	const result = await pool.query(
 		`
-		SELECT 
+SELECT 
   g.id,
   g.name,
   g.latitude AS lat,
   g.longitude AS lng,
+
   COALESCE(SUM(ge.quantity), 0)::INT AS total_equipment,
-  COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines
+  COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines,
+
+  ROUND(AVG(gr.rating), 1) AS avg_rating,
+  COUNT(DISTINCT gf.user_id) AS hearts
+
 FROM gyms g
 LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
-GROUP BY g.id, g.name, g.latitude, g.longitude
+LEFT JOIN gym_ratings gr ON gr.gym_id = g.id
+LEFT JOIN gym_favourites gf ON gf.gym_id = g.id
+
+GROUP BY g.id
 ORDER BY total_equipment DESC;
 		`
 	);
@@ -116,6 +125,47 @@ const getEquipmentById = async (id) => {
 	return result.rows[0] || null;
 };
 
+const rateGym = async (userId, gymId, rating) => {
+	const result = await pool.query(
+		`
+		INSERT INTO gym_ratings (user_id, gym_id, rating)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (user_id, gym_id)
+		DO UPDATE SET rating = EXCLUDED.rating
+		RETURNING *
+		`,
+		[userId, gymId, rating]
+	);
+
+	return result.rows[0];
+};
+
+const favouriteGym = async (userId, gymId) => {
+	const result = await pool.query(
+		`
+		INSERT INTO gym_favourites (user_id, gym_id)
+		VALUES ($1, $2)
+		ON CONFLICT DO NOTHING
+		RETURNING *
+		`,
+		[userId, gymId]
+	);
+
+	return result.rows[0] || null;
+};
+
+const removeFavouriteGym = async (userId, gymId) => {
+	const result = await pool.query(
+		`
+		DELETE FROM gym_favourites
+		WHERE user_id = $1 AND gym_id = $2
+		RETURNING *
+		`,
+		[userId, gymId]
+	);
+
+	return result.rows[0] || null;
+};
 module.exports = {
 	getGymEquipment,
 	addGymEquipment,
@@ -123,5 +173,9 @@ module.exports = {
 	decrementGymEquipment,
 	deleteGymEquipment,
 	getEquipmentById,
-	createGym
+	createGym,
+	rateGym,
+	favouriteGym,
+	favouriteGym,
+	removeFavouriteGym
 };

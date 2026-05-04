@@ -1,5 +1,4 @@
 const equipmentService = require('../services/equipmentService');
-
 const equipmentRepo = require('../repositories/equipmentRepository');
 
 // POST /equipment
@@ -55,7 +54,46 @@ const getGymsWithEquipment = async (req, res) => {
 	}
 };
 
+const rateEquipment = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const { user_id, rating } = req.body;
+		const result = await equipmentService.rateEquipment(user_id, id, rating);
+		res.json(result);
+	} catch (err) {
+		console.error('RATE EQUIPMENT ERROR:', err);
+		res.status(500).json({ error: 'Failed to rate Equipment' });
+	}
+};
+
+const favouriteEquipment = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const { user_id } = req.body;
+		const result = await equipmentService.favouriteEquipment(user_id, id);
+		res.json(result || { message: 'Already favourited' });
+	} catch (err) {
+		console.error('FAVOURITE GYM ERROR:', err);
+		res.status(500).json({ error: 'Failed to favourite equipment' });
+	}
+};
+
+const removeFavouriteEquipment = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const { user_id } = req.body;
+		const result = await equipmentService.removeFavouriteEquipment(user_id, id);
+		res.json(result || { message: 'Not found' });
+	} catch (err) {
+		console.error('REMOVE FAVOURITE ERROR:', err);
+		res.status(500).json({ error: 'Failed to remove favourite' });
+	}
+};
+
 module.exports = {
 	getGymsWithEquipment,
-  createEquipment
+	createEquipment,
+	rateEquipment,
+	favouriteEquipment,
+	removeFavouriteEquipment
 };

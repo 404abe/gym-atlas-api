@@ -95,10 +95,49 @@ const removeGymEquipment = async (req, res) => {
 	}
 };
 
+const rateGym = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const { user_id, rating } = req.body;
+		const result = await gymService.rateGym(user_id, id, rating);
+		res.json(result);
+	} catch (err) {
+		console.error('RATE GYM ERROR:', err);
+		res.status(500).json({ error: 'Failed to rate gym' });
+	}
+};
+
+const favouriteGym = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const { user_id } = req.body;
+		const result = await gymService.favouriteGym(user_id, id);
+		res.json(result || { message: 'Already favourited' });
+	} catch (err) {
+		console.error('FAVOURITE GYM ERROR:', err);
+		res.status(500).json({ error: 'Failed to favourite gym' });
+	}
+};
+
+const removeFavouriteGym = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const { user_id } = req.body;
+		const result = await gymService.removeFavouriteGym(user_id, id);
+		res.json(result || { message: 'Not found' });
+	} catch (err) {
+		console.error('REMOVE FAVOURITE ERROR:', err);
+		res.status(500).json({ error: 'Failed to remove favourite' });
+	}
+};
+
 module.exports = {
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,
 	removeGymEquipment,
-	createGym
+	createGym,
+	rateGym,
+	favouriteGym,
+	removeFavouriteGym
 };

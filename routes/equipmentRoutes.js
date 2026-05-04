@@ -20,5 +20,8 @@ router.get('/:slug/gyms', equipmentController.getGymsWithEquipment);
 
 // POST /equipment
 router.post('/', equipmentController.createEquipment);
+router.post('/:id/rate', equipmentController.rateEquipment);
+router.post('/:id/favourite', equipmentController.favouriteEquipment);
+router.delete('/:id/favourite', equipmentController.removeFavouriteEquipment);
 
 module.exports = router;

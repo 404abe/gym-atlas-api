@@ -16,12 +16,16 @@ describe('EQUIPMENT API', () => {
 	});
 
 	it('POST /equipment → creates equipment OR rejects duplicate', async () => {
-		const res = await request(app).post('/equipment').send({
-			brand: 'TestBrand',
-			series: 'TestSeries',
-			name: 'Chest Press',
-			type: 'pin_loaded'
-		});
+		const unique = Date.now();
+
+		const res = await request(app)
+			.post('/equipment')
+			.send({
+				brand: `TestBrand-${unique}`,
+				series: `TestSeries-${unique}`,
+				name: `Chest Press ${unique}`,
+				type: 'pin_loaded'
+			});
 
 		// either success OR duplicate (both acceptable)
 		expect([200, 409, 500]).toContain(res.statusCode);

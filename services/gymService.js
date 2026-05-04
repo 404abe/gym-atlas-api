@@ -40,10 +40,29 @@ const removeGymEquipment = async (gymId, equipmentId) => {
 	return null;
 };
 
+const rateGym = async (userId, gymId, rating) => {
+	return await gymRepo.rateGym(userId, gymId, rating);
+};
+
+const favouriteGym = async (userId, gymId) => {
+
+	return await gymRepo.favouriteGym(userId, gymId);
+
+};
+
+const removeFavouriteGym = async (userId, gymId) => {
+
+	return await gymRepo.removeFavouriteGym(userId, gymId);
+
+};
+
 module.exports = {
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,
 	removeGymEquipment,
-	createGym
+	createGym,
+	rateGym,
+	favouriteGym,
+	removeFavouriteGym
 };
