@@ -8,9 +8,9 @@ app.use(express.json());
 
 // routes
 const gymRoutes = require('./routes/gymRoutes');
-app.use('/gyms', gymRoutes);
-
 const equipmentRoutes = require('./routes/equipmentRoutes');
+
+app.use('/gyms', gymRoutes);
 app.use('/equipment', equipmentRoutes);
 
 module.exports = app;
