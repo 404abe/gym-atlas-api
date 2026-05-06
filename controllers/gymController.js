@@ -1,6 +1,18 @@
 const gymService = require('../services/gymService');
 const gymRepo = require('../repositories/gymRepository');
 
+// ✅ ADD THIS
+
+const getGyms = async (req, res) => {
+	try {
+		const gyms = await gymService.getGyms();
+		res.json(gyms);
+	} catch (err) {
+		console.error('GET GYMS ERROR:', err);
+		res.status(500).json({ error: 'Failed to fetch gyms' });
+	}
+};
+
 // GET /gyms/:id/equipment
 const getGymEquipment = async (req, res) => {
 	try {
@@ -98,8 +110,18 @@ const removeGymEquipment = async (req, res) => {
 const rateGym = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { user_id, rating } = req.body;
-		const result = await gymService.rateGym(user_id, id, rating);
+		const { rating } = req.body; // Remove user_id from body
+		const userId = req.user?.id; // ✅ Get from auth
+
+		if (!userId) {
+			return res.status(401).json({ error: 'No user found' });
+		}
+
+		if (!rating || rating < 1 || rating > 5) {
+			return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+		}
+
+		const result = await gymService.rateGym(userId, id, rating);
 		res.json(result);
 	} catch (err) {
 		console.error('RATE GYM ERROR:', err);
@@ -109,9 +131,17 @@ const rateGym = async (req, res) => {
 
 const favouriteGym = async (req, res) => {
 	try {
-		const { id } = req.params;
-		const { user_id } = req.body;
-		const result = await gymService.favouriteGym(user_id, id);
+		const gymId = req.params.id;
+
+		// ✅ get user from auth (NOT body)
+		const userId = req.user?.id;
+
+		if (!userId) {
+			return res.status(401).json({ error: 'No user found' });
+		}
+
+		const result = await gymService.favouriteGym(userId, gymId);
+
 		res.json(result || { message: 'Already favourited' });
 	} catch (err) {
 		console.error('FAVOURITE GYM ERROR:', err);
@@ -119,19 +149,60 @@ const favouriteGym = async (req, res) => {
 	}
 };
 
+const getFavouriteGyms = async (req, res) => {
+	try {
+		const userId = req.user?.id;
+
+		if (!userId) {
+			return res.status(401).json({ error: 'No user found' });
+		}
+
+		const favouriteGyms = await gymService.getFavouriteGyms(userId);
+
+		res.json({
+			success: true,
+			count: favouriteGyms.length,
+			data: favouriteGyms
+		});
+	} catch (err) {
+		console.error('GET FAVOURITE GYMS ERROR:', err);
+		res.status(500).json({ error: 'Failed to get favourites' });
+	}
+};
+
 const removeFavouriteGym = async (req, res) => {
 	try {
-		const { id } = req.params;
-		const { user_id } = req.body;
-		const result = await gymService.removeFavouriteGym(user_id, id);
+		const gymId = req.params.id;
+
+		// ✅ Use authenticated user instead of body
+		const userId = req.user?.id;
+
+		if (!userId) {
+			return res.status(401).json({ error: 'No user found' });
+		}
+
+		const result = await gymService.removeFavouriteGym(userId, gymId);
 		res.json(result || { message: 'Not found' });
 	} catch (err) {
 		console.error('REMOVE FAVOURITE ERROR:', err);
 		res.status(500).json({ error: 'Failed to remove favourite' });
 	}
 };
+const searchGyms = async (req, res) => {
+	try {
+		const { machines } = req.body;
+
+		const gyms = await gymService.searchGymsByMachines(machines);
+
+		res.json(gyms);
+	} catch (err) {
+		console.error('SEARCH GYMS ERROR:', err);
+		res.status(500).json({ error: 'Failed to search gyms' });
+	}
+};
 
 module.exports = {
+	getGyms,
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,
@@ -139,5 +210,7 @@ module.exports = {
 	createGym,
 	rateGym,
 	favouriteGym,
-	removeFavouriteGym
+	removeFavouriteGym,
+	searchGyms,
+	getFavouriteGyms
 };

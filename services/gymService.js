@@ -1,4 +1,9 @@
+const { search } = require('../app');
 const gymRepo = require('../repositories/gymRepository');
+
+const getGyms = async () => {
+	return await gymRepo.getGyms();
+};
 
 // POST
 const createGym = async (name, latitude, longitude) => {
@@ -45,18 +50,26 @@ const rateGym = async (userId, gymId, rating) => {
 };
 
 const favouriteGym = async (userId, gymId) => {
-
 	return await gymRepo.favouriteGym(userId, gymId);
-
 };
 
 const removeFavouriteGym = async (userId, gymId) => {
-
 	return await gymRepo.removeFavouriteGym(userId, gymId);
+};
 
+const searchGymsByMachines = async (filters) => {
+	if (!filters || filters.length === 0) {
+		return await gymRepo.getGyms();
+	}
+	return await gymRepo.searchGymsByMachines(filters);
+};
+
+const getFavouriteGyms = async (userId) => {
+	return await gymRepo.getFavouriteGyms(userId);
 };
 
 module.exports = {
+	getGyms,
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,
@@ -64,5 +77,7 @@ module.exports = {
 	createGym,
 	rateGym,
 	favouriteGym,
-	removeFavouriteGym
+	removeFavouriteGym,
+	searchGymsByMachines,
+	getFavouriteGyms
 };

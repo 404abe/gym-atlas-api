@@ -3,6 +3,7 @@ const router = express.Router();
 
 const pool = require('../db');
 const equipmentController = require('../controllers/equipmentController');
+const auth = require('../middleware/auth');
 
 // GET /equipment
 router.get('/', async (req, res) => {
@@ -20,8 +21,9 @@ router.get('/:slug/gyms', equipmentController.getGymsWithEquipment);
 
 // POST /equipment
 router.post('/', equipmentController.createEquipment);
-router.post('/:id/rate', equipmentController.rateEquipment);
-router.post('/:id/favourite', equipmentController.favouriteEquipment);
-router.delete('/:id/favourite', equipmentController.removeFavouriteEquipment);
+router.post('/:id/rate', auth, equipmentController.rateEquipment);
+router.post('/:id/favourite', auth, equipmentController.favouriteEquipment);
+router.delete('/:id/favourite', auth, equipmentController.removeFavouriteEquipment);
+router.get('/search', equipmentController.searchEquipment);
 
 module.exports = router;

@@ -1,5 +1,5 @@
+const app = require('../app');
 const request = require('supertest');
-const app = require('../server');
 
 describe('GYM + EQUIPMENT INTERACTIONS', () => {
 	const userId = 1;

@@ -1,5 +1,26 @@
 const pool = require('../db');
 
+const getGyms = async () => {
+	const result = await pool.query(`
+		SELECT 
+			g.id,
+			g.name,
+			g.latitude AS lat,
+			g.longitude AS lng,
+			COALESCE(SUM(ge.quantity), 0)::INT AS total_equipment,
+			COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines,
+			COALESCE(ROUND(AVG(gr.rating), 1), 0) AS rating,
+			COUNT(DISTINCT gf.user_id)::INT AS favourites
+		FROM gyms g
+		LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
+		LEFT JOIN gym_ratings gr ON gr.gym_id = g.id
+		LEFT JOIN gym_favourites gf ON gf.gym_id = g.id
+		GROUP BY g.id
+	`);
+
+	return result.rows;
+};
+
 const createGym = async (name, latitude, longitude) => {
 	const slug = name.toLowerCase().replace(/\s+/g, '-');
 
@@ -166,7 +187,56 @@ const removeFavouriteGym = async (userId, gymId) => {
 
 	return result.rows[0] || null;
 };
+
+const searchGymsByMachines = async (filters) => {
+	const patterns = filters.map((f) => `%${f}%`);
+
+	const result = await pool.query(
+		`
+		SELECT 
+			g.id,
+			g.name,
+			g.latitude AS lat,
+			g.longitude AS lng,
+			COALESCE(SUM(ge.quantity), 0)::INT AS total_equipment,
+			COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines,
+			COALESCE(ROUND(AVG(gr.rating), 1), 0)::FLOAT AS rating,
+			COUNT(DISTINCT gf.user_id)::INT AS favourites
+
+		FROM gyms g
+		JOIN gym_equipment ge ON ge.gym_id = g.id
+		JOIN equipment e ON e.id = ge.equipment_id
+
+		LEFT JOIN gym_ratings gr ON gr.gym_id = g.id
+		LEFT JOIN gym_favourites gf ON gf.gym_id = g.id
+
+		WHERE CONCAT_WS(' ', e.brand, e.series, e.name) ILIKE ANY($1)
+
+		GROUP BY g.id
+		HAVING COUNT(DISTINCT e.id) = $2
+		`,
+		[patterns, filters.length]
+	);
+
+	return result.rows;
+};
+const getFavouriteGyms = async (userId) => {
+	const result = await pool.query(
+		`
+		SELECT g.*
+		FROM gym_favourites gf
+		JOIN gyms g ON g.id = gf.gym_id
+		WHERE gf.user_id = $1
+		ORDER BY gf.created_at DESC
+		`,
+		[userId]
+	);
+
+	return result.rows;
+};
+
 module.exports = {
+	getGyms,
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,
@@ -177,5 +247,7 @@ module.exports = {
 	rateGym,
 	favouriteGym,
 	favouriteGym,
-	removeFavouriteGym
+	removeFavouriteGym,
+	searchGymsByMachines,
+	getFavouriteGyms
 };

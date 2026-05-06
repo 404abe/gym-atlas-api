@@ -18,3 +18,22 @@ GET {{baseUrl}}/gyms/stats
 ###
 
 http://localhost:3000/gyms/stats
+
+
+// curl for adding a gym to favourites
+404abe@Abrahams-MacBook-Pro gym-data-engine % curl -X POST http://localhost:3000/gyms/12/favourite \                            
+  -H "Content-Type: application/json" \
+  -d '{                                                   
+    "user_id": 1
+  }'
+
+
+// curl for rating a equipment. 
+404abe@Abrahams-MacBook-Pro gym-data-engine % curl -X POST http://localhost:3000/equipment/2/rate \                 
+  -H "Content-Type: application/json" \
+  -d '{"user_id":1,"rating":5}' 
+
+// curlt o rate gym 
+404abe@Abrahams-MacBook-Pro gym-data-engine % curl -X POST http://localhost:3000/gyms/1/rate \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":1,"rating":5}'

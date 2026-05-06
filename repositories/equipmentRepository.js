@@ -50,6 +50,34 @@ const getEquipmentBySlug = async (slug) => {
 	return result.rows[0];
 };
 
+const searchEquipmentByName = async (query) => {
+
+	const result = await pool.query(
+		`
+		SELECT 
+			id,
+			name,
+			brand,
+			series,
+			slug,
+			type
+		FROM equipment
+		WHERE 
+			name ILIKE $1
+			OR slug ILIKE $1
+			OR brand ILIKE $1
+			OR series ILIKE $1
+		ORDER BY name ASC
+		LIMIT 10
+		`,
+		[`%${query}%`]
+	);
+	return result.rows;
+
+};
+
+
+
 const rateEquipment = async (userId, equipmentId, rating) => {
 	const result = await pool.query(
 		`
@@ -92,6 +120,8 @@ const removeFavouriteEquipment = async (userId, equipmentId) => {
 	return result.rows[0] || null;
 };
 
+
+
 module.exports = {
 	getGymsByEquipmentSlug,
 	getEquipmentBySlug,
@@ -99,5 +129,5 @@ module.exports = {
 	favouriteEquipment,
 	rateEquipment,
 	removeFavouriteEquipment,
-	favouriteEquipment
+	searchEquipmentByName
 };

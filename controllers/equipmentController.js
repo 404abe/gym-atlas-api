@@ -57,8 +57,18 @@ const getGymsWithEquipment = async (req, res) => {
 const rateEquipment = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { user_id, rating } = req.body;
-		const result = await equipmentService.rateEquipment(user_id, id, rating);
+		const { rating } = req.body; // ✅ Remove user_id from body
+		const userId = req.user?.id; // ✅ Get from auth
+
+		if (!userId) {
+			return res.status(401).json({ error: 'No user found' });
+		}
+
+		if (!rating || rating < 1 || rating > 5) {
+			return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+		}
+
+		const result = await equipmentService.rateEquipment(userId, id, rating);
 		res.json(result);
 	} catch (err) {
 		console.error('RATE EQUIPMENT ERROR:', err);
@@ -69,11 +79,16 @@ const rateEquipment = async (req, res) => {
 const favouriteEquipment = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { user_id } = req.body;
-		const result = await equipmentService.favouriteEquipment(user_id, id);
+		const userId = req.user?.id; // ✅ Get from auth
+
+		if (!userId) {
+			return res.status(401).json({ error: 'No user found' });
+		}
+
+		const result = await equipmentService.favouriteEquipment(userId, id);
 		res.json(result || { message: 'Already favourited' });
 	} catch (err) {
-		console.error('FAVOURITE GYM ERROR:', err);
+		console.error('FAVOURITE EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to favourite equipment' });
 	}
 };
@@ -81,12 +96,31 @@ const favouriteEquipment = async (req, res) => {
 const removeFavouriteEquipment = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { user_id } = req.body;
-		const result = await equipmentService.removeFavouriteEquipment(user_id, id);
+		const userId = req.user?.id; // ✅ Get from auth
+
+		if (!userId) {
+			return res.status(401).json({ error: 'No user found' });
+		}
+
+		const result = await equipmentService.removeFavouriteEquipment(userId, id);
 		res.json(result || { message: 'Not found' });
 	} catch (err) {
 		console.error('REMOVE FAVOURITE ERROR:', err);
 		res.status(500).json({ error: 'Failed to remove favourite' });
+	}
+};
+
+const searchEquipment = async (req, res) => {
+	try {
+		const { query } = req.query;
+		if (!query) {
+			return res.json([]);
+		}
+		const results = await equipmentRepo.searchEquipmentByName(query);
+		res.json(results);
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ error: 'Failed to search equipment' });
 	}
 };
 
@@ -95,5 +129,6 @@ module.exports = {
 	createEquipment,
 	rateEquipment,
 	favouriteEquipment,
-	removeFavouriteEquipment
+	removeFavouriteEquipment,
+	searchEquipment
 };
