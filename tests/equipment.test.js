@@ -27,7 +27,7 @@ describe('EQUIPMENT API', () => {
 				type: 'pin_loaded'
 			});
 
-		// either success OR duplicate (both acceptable)
+		// either success OR duplicate 
 		expect([200, 409, 500]).toContain(res.statusCode);
 	});
 });

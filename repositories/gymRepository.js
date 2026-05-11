@@ -139,7 +139,7 @@ const deleteGymEquipment = async (gymId, equipmentId) => {
 	return result.rows[0] || null;
 };
 
-// GET equipment (for enrichment)
+
 const getEquipmentById = async (id) => {
 	const result = await pool.query(`SELECT * FROM equipment WHERE id = $1`, [id]);
 

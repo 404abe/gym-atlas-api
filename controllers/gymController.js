@@ -1,7 +1,7 @@
 const gymService = require('../services/gymService');
 const gymRepo = require('../repositories/gymRepository');
 
-// ✅ ADD THIS
+
 
 const getGyms = async (req, res) => {
 	try {
@@ -110,8 +110,8 @@ const removeGymEquipment = async (req, res) => {
 const rateGym = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { rating } = req.body; // Remove user_id from body
-		const userId = req.user?.id; // ✅ Get from auth
+		const { rating } = req.body; 
+		const userId = req.user?.id; 
 
 		if (!userId) {
 			return res.status(401).json({ error: 'No user found' });
@@ -133,7 +133,6 @@ const favouriteGym = async (req, res) => {
 	try {
 		const gymId = req.params.id;
 
-		// ✅ get user from auth (NOT body)
 		const userId = req.user?.id;
 
 		if (!userId) {
@@ -174,7 +173,6 @@ const removeFavouriteGym = async (req, res) => {
 	try {
 		const gymId = req.params.id;
 
-		// ✅ Use authenticated user instead of body
 		const userId = req.user?.id;
 
 		if (!userId) {
