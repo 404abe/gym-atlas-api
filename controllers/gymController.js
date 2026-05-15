@@ -1,8 +1,6 @@
 const gymService = require('../services/gymService');
 const gymRepo = require('../repositories/gymRepository');
 
-
-
 const getGyms = async (req, res) => {
 	try {
 		const gyms = await gymService.getGyms();
@@ -107,11 +105,21 @@ const removeGymEquipment = async (req, res) => {
 	}
 };
 
+const getGymById = async (req, res) => {
+	try {
+		const gym = await gymService.getGymById(req.params.id);
+		if (!gym) return res.status(404).json({ error: 'Gym not found' });
+		res.json(gym);
+	} catch (err) {
+		console.error('getGymById error:', err); // add this
+		res.status(500).json({ error: 'Failed to fetch gym' });
+	}
+};
 const rateGym = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { rating } = req.body; 
-		const userId = req.user?.id; 
+		const { rating } = req.body;
+		const userId = req.user?.id;
 
 		if (!userId) {
 			return res.status(401).json({ error: 'No user found' });
@@ -201,6 +209,7 @@ const searchGyms = async (req, res) => {
 
 module.exports = {
 	getGyms,
+	getGymById,
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,

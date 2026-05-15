@@ -1,3 +1,4 @@
+const { getgid } = require('node:process');
 const { search } = require('../app');
 const gymRepo = require('../repositories/gymRepository');
 
@@ -68,8 +69,13 @@ const getFavouriteGyms = async (userId) => {
 	return await gymRepo.getFavouriteGyms(userId);
 };
 
+const getGymById = async (id) => {
+	return await gymRepo.getGymById(id);
+  };
+
 module.exports = {
 	getGyms,
+	getGymById,
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,

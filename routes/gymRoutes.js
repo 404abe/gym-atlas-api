@@ -21,4 +21,6 @@ router.post('/:id/rate', auth, gymController.rateGym);
 
 router.get('/favourites', auth, gymController.getFavouriteGyms);
 
+router.get('/:id', gymController.getGymById);
+
 module.exports = router;

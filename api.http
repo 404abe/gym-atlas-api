@@ -37,3 +37,10 @@ http://localhost:3000/gyms/stats
 404abe@Abrahams-MacBook-Pro gym-data-engine % curl -X POST http://localhost:3000/gyms/1/rate \
   -H "Content-Type: application/json" \
   -d '{"user_id":1,"rating":5}'
+
+###
+GET http://localhost:3000/gyms/1
+
+###
+
+GET http://localhost:3000/gyms/1/equipment

@@ -21,6 +21,16 @@ const getGyms = async () => {
 	return result.rows;
 };
 
+const getGymById = async (id) => {
+	const result = await pool.query(
+		`SELECT id, name, slug, address, city, country, latitude AS lat, longitude AS lng,
+		created_at
+	   FROM gyms WHERE id = $1`,
+		[id]
+	);
+	return result.rows[0] || null;
+};
+
 const createGym = async (name, latitude, longitude) => {
 	const slug = name.toLowerCase().replace(/\s+/g, '-');
 
@@ -139,7 +149,6 @@ const deleteGymEquipment = async (gymId, equipmentId) => {
 	return result.rows[0] || null;
 };
 
-
 const getEquipmentById = async (id) => {
 	const result = await pool.query(`SELECT * FROM equipment WHERE id = $1`, [id]);
 
@@ -237,6 +246,7 @@ const getFavouriteGyms = async (userId) => {
 
 module.exports = {
 	getGyms,
+	getGymById,
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,
