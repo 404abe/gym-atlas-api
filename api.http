@@ -44,3 +44,15 @@ GET http://localhost:3000/gyms/1
 ###
 
 GET http://localhost:3000/gyms/1/equipment
+
+
+
+### Rate equipment
+POST http://localhost:3000/equipment/1/rate
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhYnJhaGFtLmFtYTIwMDNAZ21haWwuY29tIiwiaWF0IjoxNzc4OTMwMjg5LCJleHAiOjE3Nzk1MzUwODl9.MB0-GpArGdjBBVDylTAZ78NrM2beubSuhtOOxZd6UP4
+
+{
+  "rating": 4
+}
+

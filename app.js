@@ -10,6 +10,7 @@ app.use(express.json());
 const gymRoutes = require('./routes/gymRoutes');
 const equipmentRoutes = require('./routes/equipmentRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 app.use(
 	cors({
@@ -20,5 +21,6 @@ app.use(
 app.use('/gyms', gymRoutes);
 app.use('/equipment', equipmentRoutes);
 app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
 
 module.exports = app;

@@ -111,7 +111,7 @@ const getGymById = async (req, res) => {
 		if (!gym) return res.status(404).json({ error: 'Gym not found' });
 		res.json(gym);
 	} catch (err) {
-		console.error('getGymById error:', err); // add this
+		console.error('getGymById error:', err);
 		res.status(500).json({ error: 'Failed to fetch gym' });
 	}
 };

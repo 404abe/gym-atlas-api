@@ -16,6 +16,22 @@ const createEquipment = async (brand, series, name, type) => {
 	return result.rows[0];
 };
 
+const getAllEquipment = async (userId = null) => {
+	const result = await pool.query(
+		`
+	  SELECT 
+		e.*,
+		COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
+		MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating
+	  FROM equipment e
+	  LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
+	  GROUP BY e.id
+	  ORDER BY e.brand, e.name
+	`,
+		[userId]
+	);
+	return result.rows;
+};
 const getGymsByEquipmentSlug = async (slug) => {
 	const result = await pool.query(
 		`
@@ -51,7 +67,6 @@ const getEquipmentBySlug = async (slug) => {
 };
 
 const searchEquipmentByName = async (query) => {
-
 	const result = await pool.query(
 		`
 		SELECT 
@@ -73,10 +88,7 @@ const searchEquipmentByName = async (query) => {
 		[`%${query}%`]
 	);
 	return result.rows;
-
 };
-
-
 
 const rateEquipment = async (userId, equipmentId, rating) => {
 	const result = await pool.query(
@@ -120,9 +132,8 @@ const removeFavouriteEquipment = async (userId, equipmentId) => {
 	return result.rows[0] || null;
 };
 
-
-
 module.exports = {
+	getAllEquipment,
 	getGymsByEquipmentSlug,
 	getEquipmentBySlug,
 	createEquipment,

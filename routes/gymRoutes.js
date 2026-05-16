@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const gymController = require('../controllers/gymController');
-const auth = require('../middleware/auth');
+const { authMiddleware: auth } = require('../middleware/auth');
+require('../middleware/auth');
 
 router.get('/', gymController.getGyms);
 router.get('/stats', gymController.getGymStats);

@@ -23,9 +23,8 @@ const getGyms = async () => {
 
 const getGymById = async (id) => {
 	const result = await pool.query(
-		`SELECT id, name, slug, address, city, country, latitude AS lat, longitude AS lng,
-		created_at
-	   FROM gyms WHERE id = $1`,
+		`SELECT id, name, slug, address, city, country, latitude AS lat, longitude AS lng, instagram, created_at
+FROM gyms WHERE id = $1`,
 		[id]
 	);
 	return result.rows[0] || null;

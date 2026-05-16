@@ -57,8 +57,8 @@ const getGymsWithEquipment = async (req, res) => {
 const rateEquipment = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { rating } = req.body; // ✅ Remove user_id from body
-		const userId = req.user?.id; // ✅ Get from auth
+		const { rating } = req.body; 
+		const userId = req.user?.id; 
 
 		if (!userId) {
 			return res.status(401).json({ error: 'No user found' });
@@ -79,7 +79,7 @@ const rateEquipment = async (req, res) => {
 const favouriteEquipment = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const userId = req.user?.id; // ✅ Get from auth
+		const userId = req.user?.id;
 
 		if (!userId) {
 			return res.status(401).json({ error: 'No user found' });
