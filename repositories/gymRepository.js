@@ -1,23 +1,26 @@
 const pool = require('../db');
 
-const getGyms = async () => {
-	const result = await pool.query(`
-		SELECT 
-			g.id,
-			g.name,
-			g.latitude AS lat,
-			g.longitude AS lng,
-			COALESCE(SUM(ge.quantity), 0)::INT AS total_equipment,
-			COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines,
-			COALESCE(ROUND(AVG(gr.rating), 1), 0) AS rating,
-			COUNT(DISTINCT gf.user_id)::INT AS favourites
-		FROM gyms g
-		LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
-		LEFT JOIN gym_ratings gr ON gr.gym_id = g.id
-		LEFT JOIN gym_favourites gf ON gf.gym_id = g.id
-		GROUP BY g.id
-	`);
-
+const getGyms = async (userId = null) => {
+	const result = await pool.query(
+		`
+	  SELECT 
+		g.id,
+		g.name,
+		g.latitude AS lat,
+		g.longitude AS lng,
+		COALESCE(SUM(ge.quantity), 0)::INT AS total_equipment,
+		COUNT(DISTINCT ge.equipment_id)::INT AS unique_machines,
+		COALESCE(ROUND(AVG(gr.rating), 1), 0) AS avg_rating,
+		MAX(CASE WHEN gr.user_id = $1 THEN gr.rating END) AS user_rating,
+		COUNT(DISTINCT gf.user_id)::INT AS favourites
+	  FROM gyms g
+	  LEFT JOIN gym_equipment ge ON ge.gym_id = g.id
+	  LEFT JOIN gym_ratings gr ON gr.gym_id = g.id
+	  LEFT JOIN gym_favourites gf ON gf.gym_id = g.id
+	  GROUP BY g.id
+	`,
+		[userId]
+	);
 	return result.rows;
 };
 

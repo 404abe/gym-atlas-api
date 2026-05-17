@@ -16,43 +16,59 @@ const createEquipment = async (brand, series, name, type) => {
 	return result.rows[0];
 };
 
+const getEquipmentById = async (id, userId = null) => {
+	const result = await pool.query(
+		`
+	  SELECT 
+		e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at,
+		COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
+		MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating
+	  FROM equipment e
+	  LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
+	  WHERE e.id = $1
+	  GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at
+	  `,
+		[id, userId]
+	);
+	return result.rows[0] || null;
+};
+
 const getAllEquipment = async (userId = null) => {
 	const result = await pool.query(
 		`
 	  SELECT 
-		e.*,
+		e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at,
 		COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 		MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating
 	  FROM equipment e
 	  LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
-	  GROUP BY e.id
+	  GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at
 	  ORDER BY e.brand, e.name
-	`,
+	  `,
 		[userId]
 	);
 	return result.rows;
 };
+
 const getGymsByEquipmentSlug = async (slug) => {
 	const result = await pool.query(
 		`
-    SELECT 
-      g.id,
-      g.name,
-      g.city,
-      g.country,
-      ge.count
-    FROM gym_equipment ge
-    JOIN gyms g ON g.id = ge.gym_id
-    JOIN equipment e ON e.id = ge.equipment_id
-    WHERE e.slug = $1
-    ORDER BY ge.count DESC;
-    `,
+	  SELECT 
+		g.id,
+		g.name,
+		g.city,
+		g.country,
+		ge.quantity
+	  FROM gym_equipment ge
+	  JOIN gyms g ON g.id = ge.gym_id
+	  JOIN equipment e ON e.id = ge.equipment_id
+	  WHERE e.slug = $1
+	  ORDER BY ge.quantity DESC
+	  `,
 		[slug]
 	);
-
 	return result.rows;
 };
-
 const getEquipmentBySlug = async (slug) => {
 	const result = await pool.query(
 		`
@@ -133,6 +149,7 @@ const removeFavouriteEquipment = async (userId, equipmentId) => {
 };
 
 module.exports = {
+	getEquipmentById,
 	getAllEquipment,
 	getGymsByEquipmentSlug,
 	getEquipmentBySlug,

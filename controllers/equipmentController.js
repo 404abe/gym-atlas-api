@@ -1,6 +1,19 @@
 const equipmentService = require('../services/equipmentService');
 const equipmentRepo = require('../repositories/equipmentRepository');
 
+const getEquipmentById = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const userId = req.user?.id || null;
+		const equipment = await equipmentRepo.getEquipmentById(id, userId);
+		if (!equipment) return res.status(404).json({ error: 'Equipment not found' });
+		res.json(equipment);
+	} catch (err) {
+		console.error('GET EQUIPMENT BY ID ERROR:', err);
+		res.status(500).json({ error: 'Failed to fetch equipment' });
+	}
+};
+
 // POST /equipment
 const createEquipment = async (req, res) => {
 	try {
@@ -29,36 +42,25 @@ const createEquipment = async (req, res) => {
 	}
 };
 
-module.exports = {
-	createEquipment
-};
-
 const getGymsWithEquipment = async (req, res) => {
 	try {
 		const { slug } = req.params;
-
+		console.log('slug:', slug); // add
 		const data = await equipmentService.getGymsWithEquipment(slug);
-
-		res.json({
-			equipment: data.equipment,
-			gyms: data.gyms
-		});
+		res.json({ equipment: data.equipment, gyms: data.gyms });
 	} catch (err) {
-		console.error('FULL ERROR:', err);
-
+		console.error('FULL ERROR:', err.message, err.stack); // expand this
 		if (err.message === 'Equipment not found') {
 			return res.status(404).json({ error: 'Equipment not found' });
 		}
-
 		res.status(500).json({ error: 'Failed to fetch gyms for equipment' });
 	}
 };
-
 const rateEquipment = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { rating } = req.body; 
-		const userId = req.user?.id; 
+		const { rating } = req.body;
+		const userId = req.user?.id;
 
 		if (!userId) {
 			return res.status(401).json({ error: 'No user found' });
@@ -125,6 +127,7 @@ const searchEquipment = async (req, res) => {
 };
 
 module.exports = {
+	getEquipmentById,
 	getGymsWithEquipment,
 	createEquipment,
 	rateEquipment,

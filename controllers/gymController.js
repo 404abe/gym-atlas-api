@@ -3,10 +3,11 @@ const gymRepo = require('../repositories/gymRepository');
 
 const getGyms = async (req, res) => {
 	try {
-		const gyms = await gymService.getGyms();
+		const userId = req.user?.id || null;
+		const gyms = await gymService.getGyms(userId);
 		res.json(gyms);
 	} catch (err) {
-		console.error('GET GYMS ERROR:', err);
+		console.error('getGyms error:', err); // add this
 		res.status(500).json({ error: 'Failed to fetch gyms' });
 	}
 };

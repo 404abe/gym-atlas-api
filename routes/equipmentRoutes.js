@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
 const pool = require('../db');
 const equipmentController = require('../controllers/equipmentController');
 const equipmentRepository = require('../repositories/equipmentRepository');
@@ -15,7 +14,8 @@ router.get('/', optionalAuth, async (req, res) => {
 	res.json(equipment);
 });
 
-// GET /equipment/:slug/gyms
+//  routes BEFORE /:id
+router.get('/search', equipmentController.searchEquipment);
 router.get('/:slug/gyms', equipmentController.getGymsWithEquipment);
 
 // POST /equipment
@@ -23,6 +23,8 @@ router.post('/', equipmentController.createEquipment);
 router.post('/:id/rate', authMiddleware, equipmentController.rateEquipment);
 router.post('/:id/favourite', authMiddleware, equipmentController.favouriteEquipment);
 router.delete('/:id/favourite', authMiddleware, equipmentController.removeFavouriteEquipment);
-router.get('/search', equipmentController.searchEquipment);
+
+// GET /equipment/:id — must be last
+router.get('/:id', optionalAuth, equipmentController.getEquipmentById);
 
 module.exports = router;

@@ -3,9 +3,10 @@ const router = express.Router();
 
 const gymController = require('../controllers/gymController');
 const { authMiddleware: auth } = require('../middleware/auth');
+const { optionalAuth } = require('../middleware/auth');
 require('../middleware/auth');
 
-router.get('/', gymController.getGyms);
+router.get('/', optionalAuth, gymController.getGyms);
 router.get('/stats', gymController.getGymStats);
 router.get('/:id/equipment', gymController.getGymEquipment);
 router.post('/:gymId/equipment', gymController.addGymEquipment);
