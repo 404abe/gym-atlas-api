@@ -1,0 +1,58 @@
+@baseUrl = http://localhost:3000
+GET {{baseUrl}}/equipment
+
+###
+
+GET {{baseUrl}}/gyms/2/equipment
+
+###
+
+GET {{baseUrl}}/equipment/matrix-aura-diverging-seated-row/gyms
+
+###
+
+GET {{baseUrl}}/gyms/stats
+// curl http://localhost:3000/gyms/stats | jq
+
+
+###
+
+http://localhost:3000/gyms/stats
+
+
+// curl for adding a gym to favourites
+404abe@Abrahams-MacBook-Pro gym-data-engine % curl -X POST http://localhost:3000/gyms/12/favourite \                            
+  -H "Content-Type: application/json" \
+  -d '{                                                   
+    "user_id": 1
+  }'
+
+
+// curl for rating a equipment. 
+404abe@Abrahams-MacBook-Pro gym-data-engine % curl -X POST http://localhost:3000/equipment/2/rate \                 
+  -H "Content-Type: application/json" \
+  -d '{"user_id":1,"rating":5}' 
+
+// curlt o rate gym 
+404abe@Abrahams-MacBook-Pro gym-data-engine % curl -X POST http://localhost:3000/gyms/1/rate \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":1,"rating":5}'
+
+###
+GET http://localhost:3000/gyms/1
+
+###
+
+GET http://localhost:3000/gyms/1/equipment
+
+
+
+### Rate equipment
+POST http://localhost:3000/equipment/1/rate
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhYnJhaGFtLmFtYTIwMDNAZ21haWwuY29tIiwiaWF0IjoxNzc4OTMwMjg5LCJleHAiOjE3Nzk1MzUwODl9.MB0-GpArGdjBBVDylTAZ78NrM2beubSuhtOOxZd6UP4
+
+{
+  "rating": 4
+}
+

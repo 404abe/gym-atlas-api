@@ -1,0 +1,71 @@
+const equipmentRepo = require('../repositories/equipmentRepository');
+
+const getAllEquipment = async (userId = null) => {
+	return await equipmentRepo.getAllEquipment(userId);
+};
+
+const getEquipmentById = async (id, userId = null) => {
+	const equipment = await equipmentRepo.getEquipmentById(id, userId);
+	if (!equipment) throw new Error('Equipment not found');
+	return equipment;
+};
+
+const createEquipment = async (brand, series, name, type, createdBy = null) => {
+	if (!brand || !name) throw new Error('brand and name are required');
+	return await equipmentRepo.createEquipment(brand, series || null, name, type || null, createdBy);
+};
+
+const getGymsWithEquipment = async (slug) => {
+	const equipment = await equipmentRepo.getEquipmentBySlug(slug);
+	if (!equipment) throw new Error('Equipment not found');
+	const gyms = await equipmentRepo.getGymsByEquipmentSlug(slug);
+	return { equipment, gyms };
+};
+
+const searchEquipment = async (query) => {
+	if (!query) return [];
+	return await equipmentRepo.searchEquipmentByName(query);
+};
+
+const getBrands = async () => {
+	return await equipmentRepo.getBrands();
+};
+
+const getSeriesByBrand = async (brand) => {
+	if (!brand) throw new Error('brand is required');
+	return await equipmentRepo.getSeriesByBrand(brand);
+};
+
+const uploadEquipmentImage = async (id, fileBuffer) => {
+	if (!fileBuffer) throw new Error('No image provided');
+	return await equipmentRepo.uploadEquipmentImage(id, fileBuffer);
+};
+
+const rateEquipment = async (userId, equipmentId, rating) => {
+	if (!rating || rating < 1 || rating > 5) {
+		throw new Error('Rating must be between 1 and 5');
+	}
+	return await equipmentRepo.rateEquipment(userId, equipmentId, rating);
+};
+
+const favouriteEquipment = async (userId, equipmentId) => {
+	return await equipmentRepo.favouriteEquipment(userId, equipmentId);
+};
+
+const removeFavouriteEquipment = async (userId, equipmentId) => {
+	return await equipmentRepo.removeFavouriteEquipment(userId, equipmentId);
+};
+
+module.exports = {
+	getAllEquipment,
+	getEquipmentById,
+	createEquipment,
+	getGymsWithEquipment,
+	searchEquipment,
+	getBrands,
+	getSeriesByBrand,
+	uploadEquipmentImage,
+	rateEquipment,
+	favouriteEquipment,
+	removeFavouriteEquipment
+};

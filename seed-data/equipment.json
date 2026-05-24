@@ -1,0 +1,155 @@
+[
+	{
+		"brand": "Booty Builder",
+		"series": null,
+		"name": "Platinum V4",
+		"type": "plate_loaded",
+		"slug": "booty-builder-platinum-v4",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779190767/gym-atlas/equipment/qmbvziblxqjp4z3wovmj.jpg",
+		"status": "approved"
+	},
+	{
+		"brand": "Booty Builder",
+		"series": null,
+		"name": "Standing Hip Thrust",
+		"type": "plate_loaded",
+		"slug": "booty-builder-standing-hip-thrust",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779143634/gym-atlas/equipment/ptbtdhvggqykj66jc7ng.jpg",
+		"status": "approved"
+	},
+	{
+		"brand": "Booty Builder",
+		"series": null,
+		"name": "V8",
+		"type": "pin_loaded",
+		"slug": "booty-builder-v8",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779141614/gym-atlas/equipment/f6rswc2d5jytzneqfvux.jpg",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Chest Press",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-chest-press",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779016535/gym-atlas/equipment/b9x45pkkqpysio3m2sgl.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Converging Chest Press",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-converging-chest-press",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779029718/gym-atlas/equipment/cjlb702e0mcituow9liq.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Converging Shoulder Press",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-converging-shoulder-press",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779029735/gym-atlas/equipment/ofelaaxpzrzpz1go4qc7.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Lateral Raise",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-lateral-raise",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779028824/gym-atlas/equipment/caxqky6nub8azav5sblj.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Lat Pulldown",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-lat-pulldown",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779029784/gym-atlas/equipment/pmtvrw2itdzqoqtegugy.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Leg Press",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-leg-press",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779142955/gym-atlas/equipment/h8ct4bpcw87vykvrhfwd.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Pectoral Fly",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-pectoral-fly",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779029068/gym-atlas/equipment/aeualjdk6evu8vlrmxqk.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Rear Delt Fly",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-rear-delt-fly",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779029759/gym-atlas/equipment/jaalnwegweqhmh9w0bvp.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Seated Row",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-seated-row",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779031891/gym-atlas/equipment/ghzejshoye4w7oqmprfb.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Aura",
+		"name": "Shoulder Press",
+		"type": "pin_loaded",
+		"slug": "matrix-aura-shoulder-press",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779029747/gym-atlas/equipment/lkyfiiiyshkifoa8reba.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Glute Trainer",
+		"type": "plate_loaded",
+		"slug": "matrix-magnum-glute-trainer",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779143140/gym-atlas/equipment/fd5rzrbtyyofmf8f5pm3.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Matrix",
+		"series": "Magnum",
+		"name": "Vertical Bench Press",
+		"type": "plate_loaded",
+		"slug": "matrix-magnum-vertical-bench-press",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779195431/gym-atlas/equipment/hcjjk8mnjrszgzla4t9j.png",
+		"status": "approved"
+	},
+	{
+		"brand": "Prime",
+		"series": "Hybrid",
+		"name": "Pec/Rear Delt",
+		"type": "pin_loaded",
+		"slug": "prime-hybrid-pec-rear-delt",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779555990/gym-atlas/equipment/sejerrg0dxhzcq0duw7u.webp",
+		"status": "approved"
+	},
+	{
+		"brand": "Prime",
+		"series": "Plate Loaded",
+		"name": "Hack Squat",
+		"type": "plate_loaded",
+		"slug": "prime-plate-loaded-hack-squat",
+		"image_url": "https://res.cloudinary.com/dhtdarjdj/image/upload/v1779569206/gym-atlas/equipment/isczhjph8q3egqg366kt.webp",
+		"status": "approved"
+	}
+]
