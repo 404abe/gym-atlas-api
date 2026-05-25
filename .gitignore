@@ -15,4 +15,5 @@ coverage/
 
 # Editor
 .vscode/
-.idea/
+.idea/gym_atlas_backup.sql
+gym_atlas_backup
