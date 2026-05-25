@@ -6,6 +6,7 @@ const getGyms = async (userId = null) => {
         SELECT 
             g.id,
             g.name,
+            g.image_url,
             g.latitude AS lat,
             g.longitude AS lng,
             COALESCE(eq.total_equipment, 0)::INT AS total_equipment,
