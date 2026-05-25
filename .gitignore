@@ -1,3 +1,4 @@
+cat > .gitignore << 'EOF'
 node_modules
 .env
 dist
@@ -13,7 +14,17 @@ Thumbs.db
 # Test coverage
 coverage/
 
-# Editor
-.vscode/
-.idea/gym_atlas_backup.sql
+# Database backups
+gym_atlas_backup.sql
 gym_atlas_backup
+
+# Docker
+docker-compose.yml
+
+# API testing
+api.http
+
+# AI tooling
+CLAUDE.md
+CODE.md
+EOF
