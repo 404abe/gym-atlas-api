@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
             ORDER BY total_contributions DESC
             LIMIT 100
         `);
-		res.json({ leaderboard: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		console.error('LEADERBOARD ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch leaderboard' });
@@ -92,16 +92,18 @@ router.get('/user/:id', async (req, res) => {
 		);
 
 		res.json({
-			summary: summary.rows[0] || {
-				gyms_added: 0,
-				equipment_added: 0,
-				equipment_linked: 0,
-				total_contributions: 0
-			},
-			recent: {
-				gyms: gyms.rows,
-				equipment: equipment.rows,
-				links: links.rows
+			data: {
+				summary: summary.rows[0] || {
+					gyms_added: 0,
+					equipment_added: 0,
+					equipment_linked: 0,
+					total_contributions: 0
+				},
+				recent: {
+					gyms: gyms.rows,
+					equipment: equipment.rows,
+					links: links.rows
+				}
 			}
 		});
 	} catch (err) {

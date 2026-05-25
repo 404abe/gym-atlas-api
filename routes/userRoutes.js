@@ -12,9 +12,11 @@ router.get('/:id/stats', auth, async (req, res) => {
 			pool.query(`SELECT COUNT(*) FROM equipment_favourites WHERE user_id = $1`, [userId])
 		]);
 		res.json({
-			totalRatings: parseInt(ratingsRes.rows[0].count),
-			favouriteGymsCount: parseInt(gymFavsRes.rows[0].count),
-			favouriteEquipmentCount: parseInt(equipFavsRes.rows[0].count)
+			data: {
+				totalRatings: parseInt(ratingsRes.rows[0].count),
+				favouriteGymsCount: parseInt(gymFavsRes.rows[0].count),
+				favouriteEquipmentCount: parseInt(equipFavsRes.rows[0].count)
+			}
 		});
 	} catch (err) {
 		console.error(err);
@@ -32,7 +34,7 @@ router.get('/:id/ratings/gyms', auth, async (req, res) => {
 			 ORDER BY gr.created_at DESC`,
 			[req.params.id]
 		);
-		res.json({ success: true, data: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		res.status(500).json({ error: 'Failed to fetch gym ratings' });
 	}
@@ -48,7 +50,7 @@ router.get('/:id/ratings/equipment', auth, async (req, res) => {
 			 ORDER BY er.created_at DESC`,
 			[req.params.id]
 		);
-		res.json({ success: true, data: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		res.status(500).json({ error: 'Failed to fetch equipment ratings' });
 	}
@@ -64,7 +66,7 @@ router.get('/:id/favourites/gyms', auth, async (req, res) => {
 			 ORDER BY gf.created_at DESC`,
 			[req.params.id]
 		);
-		res.json({ success: true, data: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		res.status(500).json({ error: 'Failed to fetch favourite gyms' });
 	}
@@ -80,7 +82,7 @@ router.get('/:id/favourites/equipment', auth, async (req, res) => {
 			 ORDER BY ef.created_at DESC`,
 			[req.params.id]
 		);
-		res.json({ success: true, data: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		res.status(500).json({ error: 'Failed to fetch favourite equipment' });
 	}
@@ -99,7 +101,7 @@ router.get('/:id', async (req, res) => {
 			[req.params.id]
 		);
 		if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
-		res.json(result.rows[0]);
+		res.json({ data: result.rows[0] });
 	} catch (err) {
 		res.status(500).json({ error: 'Failed to fetch user' });
 	}

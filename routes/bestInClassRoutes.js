@@ -7,7 +7,7 @@ const { authMiddleware } = require('../middleware/auth');
 router.get('/categories', async (req, res) => {
 	try {
 		const result = await pool.query(`SELECT * FROM equipment_categories ORDER BY type, name`);
-		res.json({ categories: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		console.error('GET CATEGORIES ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch categories' });
@@ -37,7 +37,7 @@ router.get('/user/:id', async (req, res) => {
 			`,
 			[req.params.id]
 		);
-		res.json({ best_in_class: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		console.error('GET BEST IN CLASS ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch best in class' });
@@ -60,7 +60,7 @@ router.post('/', authMiddleware, async (req, res) => {
 			`,
 			[userId, category_id, equipment_id]
 		);
-		res.json({ success: true, data: result.rows[0] });
+		res.json({ data: result.rows[0] });
 	} catch (err) {
 		console.error('SET BEST IN CLASS ERROR:', err);
 		res.status(500).json({ error: 'Failed to set best in class' });
@@ -74,7 +74,7 @@ router.delete('/:categoryId', authMiddleware, async (req, res) => {
 			req.user.id,
 			req.params.categoryId
 		]);
-		res.json({ success: true });
+		res.json({ data: null });
 	} catch (err) {
 		console.error('DELETE BEST IN CLASS ERROR:', err);
 		res.status(500).json({ error: 'Failed to remove best in class' });

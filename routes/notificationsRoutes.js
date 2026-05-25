@@ -13,7 +13,7 @@ router.get('/', authMiddleware, async (req, res) => {
              LIMIT 50`,
 			[req.user.id]
 		);
-		res.json({ notifications: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ error: 'Failed to fetch notifications' });
@@ -26,7 +26,7 @@ router.post('/read-all', authMiddleware, async (req, res) => {
 		await pool.query(`UPDATE notifications SET read = true WHERE user_id = $1 AND read = false`, [
 			req.user.id
 		]);
-		res.json({ success: true });
+		res.json({ data: null });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ error: 'Failed to mark all as read' });
@@ -40,7 +40,7 @@ router.post('/:id/read', authMiddleware, async (req, res) => {
 			req.params.id,
 			req.user.id
 		]);
-		res.json({ success: true });
+		res.json({ data: null });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ error: 'Failed to mark as read' });

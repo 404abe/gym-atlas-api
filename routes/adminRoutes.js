@@ -18,7 +18,7 @@ router.get('/users', superAdminMiddleware, async (req, res) => {
 		const result = await pool.query(
 			`SELECT id, email, role, created_at FROM users ORDER BY created_at DESC`
 		);
-		res.json({ users: result.rows });
+		res.json({ data: result.rows });
 	} catch (err) {
 		console.error('GET USERS ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch users' });
@@ -54,7 +54,7 @@ router.get('/pending', async (req, res) => {
              WHERE ge.status = 'pending'
              ORDER BY ge.created_at DESC`
 		);
-		res.json({ gyms: gyms.rows, equipment: equipment.rows, suggestions: suggestions.rows });
+		res.json({ data: { gyms: gyms.rows, equipment: equipment.rows, suggestions: suggestions.rows } });
 	} catch (err) {
 		console.error('GET PENDING ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch pending submissions' });
@@ -74,7 +74,7 @@ router.post('/approve/gym/:id', async (req, res) => {
 		if (gym.created_by) {
 			await notify(gym.created_by, 'gym_approved', `Your gym "${gym.name}" was approved!`, gym.id);
 		}
-		res.json({ message: 'Gym approved', gym });
+		res.json({ data: gym });
 	} catch (err) {
 		console.error('APPROVE GYM ERROR:', err);
 		res.status(500).json({ error: 'Failed to approve gym' });
@@ -89,7 +89,7 @@ router.post('/reject/gym/:id', async (req, res) => {
 			[req.params.id]
 		);
 		if (!result.rows[0]) return res.status(404).json({ error: 'Gym not found' });
-		res.json({ message: 'Gym rejected', gym: result.rows[0] });
+		res.json({ data: result.rows[0] });
 	} catch (err) {
 		console.error('REJECT GYM ERROR:', err);
 		res.status(500).json({ error: 'Failed to reject gym' });
@@ -114,7 +114,7 @@ router.post('/approve/suggestion/:id', async (req, res) => {
 				sugg.id
 			);
 		}
-		res.json({ message: 'Suggestion approved', suggestion: sugg });
+		res.json({ data: sugg });
 	} catch (err) {
 		console.error('APPROVE SUGGESTION ERROR:', err);
 		res.status(500).json({ error: 'Failed to approve suggestion' });
@@ -129,7 +129,7 @@ router.post('/reject/suggestion/:id', async (req, res) => {
 			[req.params.id]
 		);
 		if (!result.rows[0]) return res.status(404).json({ error: 'Suggestion not found' });
-		res.json({ message: 'Suggestion rejected', suggestion: result.rows[0] });
+		res.json({ data: result.rows[0] });
 	} catch (err) {
 		console.error('REJECT SUGGESTION ERROR:', err);
 		res.status(500).json({ error: 'Failed to reject suggestion' });
@@ -154,7 +154,7 @@ router.post('/approve/equipment/:id', async (req, res) => {
 				eq.id
 			);
 		}
-		res.json({ message: 'Equipment approved', equipment: eq });
+		res.json({ data: eq });
 	} catch (err) {
 		console.error('APPROVE EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to approve equipment' });
@@ -169,7 +169,7 @@ router.post('/reject/equipment/:id', async (req, res) => {
 			[req.params.id]
 		);
 		if (!result.rows[0]) return res.status(404).json({ error: 'Equipment not found' });
-		res.json({ message: 'Equipment rejected', equipment: result.rows[0] });
+		res.json({ data: result.rows[0] });
 	} catch (err) {
 		console.error('REJECT EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to reject equipment' });
@@ -184,7 +184,7 @@ router.post('/make-admin/:userId', superAdminMiddleware, async (req, res) => {
 			[req.params.userId]
 		);
 		if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
-		res.json({ message: 'User promoted to admin', user: result.rows[0] });
+		res.json({ data: result.rows[0] });
 	} catch (err) {
 		console.error('MAKE ADMIN ERROR:', err);
 		res.status(500).json({ error: 'Failed to update role' });

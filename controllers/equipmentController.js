@@ -4,7 +4,7 @@ const getAllEquipment = async (req, res) => {
 	try {
 		const userId = req.user?.id || null;
 		const equipment = await equipmentService.getAllEquipment(userId);
-		res.json(equipment);
+		res.json({ data: equipment });
 	} catch (err) {
 		console.error('GET ALL EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch equipment' });
@@ -15,7 +15,7 @@ const getEquipmentById = async (req, res) => {
 	try {
 		const userId = req.user?.id || null;
 		const equipment = await equipmentService.getEquipmentById(req.params.id, userId);
-		res.json(equipment);
+		res.json({ data: equipment });
 	} catch (err) {
 		if (err.message === 'Equipment not found') {
 			return res.status(404).json({ error: err.message });
@@ -30,7 +30,7 @@ const createEquipment = async (req, res) => {
 		const { brand, series, name, type } = req.body;
 		const createdBy = req.user?.id || null;
 		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy);
-		res.status(201).json({ success: true, data: equipment });
+		res.status(201).json({ data: equipment });
 	} catch (err) {
 		if (err.message === 'brand and name are required') {
 			return res.status(400).json({ error: err.message });
@@ -43,7 +43,7 @@ const createEquipment = async (req, res) => {
 const getGymsWithEquipment = async (req, res) => {
 	try {
 		const data = await equipmentService.getGymsWithEquipment(req.params.slug);
-		res.json(data);
+		res.json({ data });
 	} catch (err) {
 		if (err.message === 'Equipment not found') {
 			return res.status(404).json({ error: err.message });
@@ -56,7 +56,7 @@ const getGymsWithEquipment = async (req, res) => {
 const searchEquipment = async (req, res) => {
 	try {
 		const results = await equipmentService.searchEquipment(req.query.query);
-		res.json(results);
+		res.json({ data: results });
 	} catch (err) {
 		console.error('SEARCH EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to search equipment' });
@@ -66,7 +66,7 @@ const searchEquipment = async (req, res) => {
 const getBrands = async (req, res) => {
 	try {
 		const brands = await equipmentService.getBrands();
-		res.json({ brands });
+		res.json({ data: brands });
 	} catch (err) {
 		console.error('GET BRANDS ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch brands' });
@@ -76,7 +76,7 @@ const getBrands = async (req, res) => {
 const getSeriesByBrand = async (req, res) => {
 	try {
 		const series = await equipmentService.getSeriesByBrand(req.query.brand);
-		res.json({ series });
+		res.json({ data: series });
 	} catch (err) {
 		if (err.message === 'brand is required') {
 			return res.status(400).json({ error: err.message });
@@ -89,7 +89,7 @@ const getSeriesByBrand = async (req, res) => {
 const uploadEquipmentImage = async (req, res) => {
 	try {
 		const image_url = await equipmentService.uploadEquipmentImage(req.params.id, req.file?.buffer);
-		res.json({ image_url });
+		res.json({ data: { image_url } });
 	} catch (err) {
 		if (err.message === 'No image provided') {
 			return res.status(400).json({ error: err.message });
@@ -104,7 +104,7 @@ const rateEquipment = async (req, res) => {
 		const userId = req.user?.id;
 		if (!userId) return res.status(401).json({ error: 'No user found' });
 		const result = await equipmentService.rateEquipment(userId, req.params.id, req.body.rating);
-		res.json(result);
+		res.json({ data: result });
 	} catch (err) {
 		if (err.message === 'Rating must be between 1 and 5') {
 			return res.status(400).json({ error: err.message });
@@ -119,7 +119,7 @@ const favouriteEquipment = async (req, res) => {
 		const userId = req.user?.id;
 		if (!userId) return res.status(401).json({ error: 'No user found' });
 		const result = await equipmentService.favouriteEquipment(userId, req.params.id);
-		res.json(result || { message: 'Already favourited' });
+		res.json({ data: result });
 	} catch (err) {
 		console.error('FAVOURITE EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to favourite equipment' });
@@ -131,7 +131,7 @@ const removeFavouriteEquipment = async (req, res) => {
 		const userId = req.user?.id;
 		if (!userId) return res.status(401).json({ error: 'No user found' });
 		const result = await equipmentService.removeFavouriteEquipment(userId, req.params.id);
-		res.json(result || { message: 'Not found' });
+		res.json({ data: result });
 	} catch (err) {
 		console.error('REMOVE FAVOURITE ERROR:', err);
 		res.status(500).json({ error: 'Failed to remove favourite' });

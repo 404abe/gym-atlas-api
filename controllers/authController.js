@@ -4,7 +4,7 @@ const register = async (req, res) => {
 	try {
 		const { email, password, username } = req.body;
 		const user = await authService.register(email, password, username);
-		res.status(201).json(user);
+		res.status(201).json({ data: user });
 	} catch (err) {
 		if (
 			err.message === 'Email, password, and username required' ||
@@ -30,7 +30,7 @@ const login = async (req, res) => {
 	try {
 		const { email, password } = req.body;
 		const result = await authService.login(email, password);
-		res.json(result);
+		res.json({ data: result });
 	} catch (err) {
 		if (err.message === 'Invalid credentials') {
 			return res.status(401).json({ error: err.message });

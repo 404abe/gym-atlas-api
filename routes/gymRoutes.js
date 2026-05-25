@@ -33,7 +33,7 @@ router.post('/:id/image', authMiddleware, upload.single('image'), async (req, re
 			result.secure_url,
 			req.params.id
 		]);
-		res.json({ image_url: result.secure_url });
+		res.json({ data: { image_url: result.secure_url } });
 	} catch (err) {
 		console.error('IMAGE UPLOAD ERROR:', err);
 		res.status(500).json({ error: 'Failed to upload image' });

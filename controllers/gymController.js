@@ -5,7 +5,7 @@ const getGyms = async (req, res) => {
 	try {
 		const userId = req.user?.id || null;
 		const gyms = await gymService.getGyms(userId);
-		res.json(gyms);
+		res.json({ data: gyms });
 	} catch (err) {
 		console.error('getGyms error:', err); 
 		res.status(500).json({ error: 'Failed to fetch gyms' });
@@ -18,10 +18,7 @@ const getGymEquipment = async (req, res) => {
 		const gymId = req.params.id;
 		const data = await gymService.getGymEquipment(gymId);
 
-		res.json({
-			gym_id: gymId,
-			equipment: data
-		});
+		res.json({ data });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ error: 'Failed to fetch gym equipment' });
@@ -44,7 +41,7 @@ const createGym = async (req, res) => {
 			instagram,
 			createdBy 
 		);
-		res.status(201).json({ message: 'Gym submitted for review', gym });
+		res.status(201).json({ data: gym });
 	} catch (err) {
 		console.error('CREATE GYM ERROR:', err);
 		res.status(500).json({ error: 'Failed to create gym' });
@@ -69,7 +66,7 @@ const addGymEquipment = async (req, res) => {
 			status,
 			createdBy
 		);
-		res.json({ success: true, data: result });
+		res.json({ data: result });
 	} catch (err) {
 		console.error('POST ERROR:', err);
 		res.status(500).json({ error: 'Failed to add gym equipment' });
@@ -96,25 +93,10 @@ const removeGymEquipment = async (req, res) => {
 		const result = await gymService.removeGymEquipment(Number(gymId), Number(equipmentId));
 
 		if (!result) {
-			return res.status(404).json({
-				success: false,
-				error: 'Equipment not found in gym'
-			});
+			return res.status(404).json({ error: 'Equipment not found in gym' });
 		}
 
-		const equipment = await gymRepo.getEquipmentById(result.row.equipment_id);
-
-		const name = equipment
-			? `${equipment.brand} ${equipment.series ?? ''} ${equipment.name}`.trim()
-			: 'Equipment';
-
-		return res.json({
-			success: true,
-			action: result.action,
-			message:
-				result.action === 'decremented' ? `${name} quantity decreased` : `${name} removed from gym`,
-			data: result.row
-		});
+		return res.json({ data: result.row });
 	} catch (err) {
 		console.error('DELETE ERROR:', err);
 		res.status(500).json({ error: 'Failed to remove equipment' });
@@ -125,7 +107,7 @@ const getGymById = async (req, res) => {
 	const userId = req.user?.id || null;
 	const gym = await gymRepo.getGymById(req.params.id, userId);
 	if (!gym) return res.status(404).json({ error: 'Gym not found' });
-	res.json(gym);
+	res.json({ data: gym });
 };
 const rateGym = async (req, res) => {
 	try {
@@ -142,7 +124,7 @@ const rateGym = async (req, res) => {
 		}
 
 		const result = await gymService.rateGym(userId, id, rating);
-		res.json(result);
+		res.json({ data: result });
 	} catch (err) {
 		console.error('RATE GYM ERROR:', err);
 		res.status(500).json({ error: 'Failed to rate gym' });
@@ -161,7 +143,7 @@ const favouriteGym = async (req, res) => {
 
 		const result = await gymService.favouriteGym(userId, gymId);
 
-		res.json(result || { message: 'Already favourited' });
+		res.json({ data: result });
 	} catch (err) {
 		console.error('FAVOURITE GYM ERROR:', err);
 		res.status(500).json({ error: 'Failed to favourite gym' });
@@ -178,11 +160,7 @@ const getFavouriteGyms = async (req, res) => {
 
 		const favouriteGyms = await gymService.getFavouriteGyms(userId);
 
-		res.json({
-			success: true,
-			count: favouriteGyms.length,
-			data: favouriteGyms
-		});
+		res.json({ data: favouriteGyms });
 	} catch (err) {
 		console.error('GET FAVOURITE GYMS ERROR:', err);
 		res.status(500).json({ error: 'Failed to get favourites' });
@@ -200,7 +178,7 @@ const removeFavouriteGym = async (req, res) => {
 		}
 
 		const result = await gymService.removeFavouriteGym(userId, gymId);
-		res.json(result || { message: 'Not found' });
+		res.json({ data: result });
 	} catch (err) {
 		console.error('REMOVE FAVOURITE ERROR:', err);
 		res.status(500).json({ error: 'Failed to remove favourite' });
@@ -212,7 +190,7 @@ const searchGyms = async (req, res) => {
 
 		const gyms = await gymService.searchGymsByMachines(machines);
 
-		res.json(gyms);
+		res.json({ data: gyms });
 	} catch (err) {
 		console.error('SEARCH GYMS ERROR:', err);
 		res.status(500).json({ error: 'Failed to search gyms' });
