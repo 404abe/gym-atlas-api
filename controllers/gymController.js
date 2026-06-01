@@ -1,5 +1,7 @@
 const gymService = require('../services/gymService');
 const gymRepo = require('../repositories/gymRepository');
+const pool = require('../db');
+const { createNotification } = require('../routes/notificationsRoutes');
 
 const getGyms = async (req, res) => {
 	try {
@@ -39,8 +41,15 @@ const createGym = async (req, res) => {
 			city,
 			country,
 			instagram,
-			createdBy 
+			createdBy
 		);
+		if (createdBy) {
+			try {
+				await createNotification(pool, createdBy, 'submission_received', gym.id, 'Your gym submission is under review');
+			} catch (notifyErr) {
+				console.error('GYM NOTIFICATION ERROR:', notifyErr);
+			}
+		}
 		res.status(201).json({ data: gym });
 	} catch (err) {
 		console.error('CREATE GYM ERROR:', err);

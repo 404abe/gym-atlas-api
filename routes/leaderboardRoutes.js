@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
                 COUNT(DISTINCT e.id) AS equipment_added,
                 COUNT(DISTINCT ge.id) AS equipment_linked,
                 (COUNT(DISTINCT g.id) + COUNT(DISTINCT e.id) + COUNT(DISTINCT ge.id)) AS total_contributions
-            FROM users u
+            FROM profiles u
             LEFT JOIN gyms g ON g.created_by = u.id AND g.status = 'approved'
             LEFT JOIN equipment e ON e.created_by = u.id AND e.status = 'approved'
             LEFT JOIN gym_equipment ge ON ge.created_by = u.id AND ge.status = 'approved'
@@ -41,7 +41,7 @@ router.get('/user/:id', async (req, res) => {
                 COUNT(DISTINCT e.id) AS equipment_added,
                 COUNT(DISTINCT ge.id) AS equipment_linked,
                 (COUNT(DISTINCT g.id) + COUNT(DISTINCT e.id) + COUNT(DISTINCT ge.id)) AS total_contributions
-            FROM users u
+            FROM profiles u
             LEFT JOIN gyms g ON g.created_by = u.id AND g.status = 'approved'
             LEFT JOIN equipment e ON e.created_by = u.id AND e.status = 'approved'
             LEFT JOIN gym_equipment ge ON ge.created_by = u.id AND ge.status = 'approved'

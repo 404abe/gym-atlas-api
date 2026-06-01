@@ -92,11 +92,11 @@ router.get('/:id/favourites/equipment', auth, async (req, res) => {
 router.get('/:id', async (req, res) => {
 	try {
 		const result = await pool.query(
-			`SELECT 
+			`SELECT
 				u.username, u.created_at,
 				(SELECT COUNT(*) FROM gym_ratings       WHERE user_id = u.id)::int AS gyms_rated,
 				(SELECT COUNT(*) FROM equipment_ratings WHERE user_id = u.id)::int AS equipment_rated
-			 FROM users u
+			 FROM profiles u
 			 WHERE u.id = $1`,
 			[req.params.id]
 		);

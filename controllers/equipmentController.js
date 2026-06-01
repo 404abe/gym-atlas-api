@@ -1,4 +1,6 @@
 const equipmentService = require('../services/equipmentService');
+const pool = require('../db');
+const { createNotification } = require('../routes/notificationsRoutes');
 
 const getAllEquipment = async (req, res) => {
 	try {
@@ -27,9 +29,16 @@ const getEquipmentById = async (req, res) => {
 
 const createEquipment = async (req, res) => {
 	try {
-		const { brand, series, name, type } = req.body;
+		const { brand, series, name, type, resistance_profile } = req.body;
 		const createdBy = req.user?.id || null;
-		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy);
+		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy, resistance_profile);
+		if (createdBy) {
+			try {
+				await createNotification(pool, createdBy, 'submission_received', equipment.id, 'Your equipment submission is under review');
+			} catch (notifyErr) {
+				console.error('EQUIPMENT NOTIFICATION ERROR:', notifyErr);
+			}
+		}
 		res.status(201).json({ data: equipment });
 	} catch (err) {
 		if (err.message === 'brand and name are required') {

@@ -2,7 +2,7 @@ const pool = require('../db');
 const cloudinary = require('../config/cloudinary');
 
 // CREATE new equipment (catalog)
-const createEquipment = async (brand, series, name, type, createdBy = null) => {
+const createEquipment = async (brand, series, name, type, createdBy = null, resistanceProfile = 'constant') => {
 	const slug = `${brand}-${series || ''}-${name}`
 		.toLowerCase()
 		.replace(/[\/\\]/g, '-')
@@ -12,9 +12,9 @@ const createEquipment = async (brand, series, name, type, createdBy = null) => {
 		.replace(/^-|-$/g, '');
 
 	const result = await pool.query(
-		`INSERT INTO equipment (brand, series, name, type, slug, status, created_by)
-         VALUES ($1, $2, $3, $4, $5, 'pending', $6) RETURNING *`,
-		[brand, series, name, type, slug, createdBy]
+		`INSERT INTO equipment (brand, series, name, type, slug, status, created_by, resistance_profile)
+         VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7) RETURNING *`,
+		[brand, series, name, type, slug, createdBy, resistanceProfile]
 	);
 	return result.rows[0];
 };
@@ -23,14 +23,17 @@ const createEquipment = async (brand, series, name, type, createdBy = null) => {
 const getEquipmentById = async (id, userId = null) => {
 	const result = await pool.query(
 		`
-		SELECT 
+		SELECT
 			e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status,
+			e.resistance_profile,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
-			MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating
+			MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating,
+			COALESCE(BOOL_OR(ef.user_id = $2), false) AS is_favorite
 		FROM equipment e
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
+		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
 		WHERE e.id = $1
-		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status
+		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status, e.resistance_profile
 		`,
 		[id, userId]
 	);
@@ -40,14 +43,17 @@ const getEquipmentById = async (id, userId = null) => {
 const getAllEquipment = async (userId = null) => {
 	const result = await pool.query(
 		`
-		SELECT 
+		SELECT
 			e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status,
+			e.resistance_profile,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
-			MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating
+			MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating,
+			COALESCE(BOOL_OR(ef.user_id = $1), false) AS is_favorite
 		FROM equipment e
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
+		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
 		WHERE e.status = 'approved'
-		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status
+		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status, e.resistance_profile
 		ORDER BY e.brand, e.name
 		`,
 		[userId]
@@ -155,7 +161,7 @@ const favouriteEquipment = async (userId, equipmentId) => {
 		`
 		INSERT INTO equipment_favourites (user_id, equipment_id)
 		VALUES ($1, $2)
-		ON CONFLICT DO NOTHING
+		ON CONFLICT (user_id, equipment_id) DO NOTHING
 		RETURNING *
 		`,
 		[userId, equipmentId]

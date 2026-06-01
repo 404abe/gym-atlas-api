@@ -2,12 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const { authMiddleware, adminMiddleware, superAdminMiddleware } = require('../middleware/auth');
-
-const notify = (userId, type, message, relatedId) =>
-	pool.query(
-		`INSERT INTO notifications (user_id, type, message, related_id) VALUES ($1, $2, $3, $4)`,
-		[userId, type, message, relatedId]
-	);
+const { createNotification } = require('./notificationsRoutes');
 
 // All admin routes require auth + admin role
 router.use(authMiddleware, adminMiddleware);
@@ -16,7 +11,7 @@ router.use(authMiddleware, adminMiddleware);
 router.get('/users', superAdminMiddleware, async (req, res) => {
 	try {
 		const result = await pool.query(
-			`SELECT id, email, role, created_at FROM users ORDER BY created_at DESC`
+			`SELECT id, email, username, role, created_at FROM profiles ORDER BY created_at DESC`
 		);
 		res.json({ data: result.rows });
 	} catch (err) {
@@ -29,28 +24,28 @@ router.get('/users', superAdminMiddleware, async (req, res) => {
 router.get('/pending', async (req, res) => {
 	try {
 		const gyms = await pool.query(
-			`SELECT g.*, u.email AS submitted_by    
+			`SELECT g.*, u.email AS submitted_by
              FROM gyms g
-             LEFT JOIN users u ON u.id = g.created_by
+             LEFT JOIN profiles u ON u.id = g.created_by
              WHERE g.status = 'pending'
              ORDER BY g.created_at DESC`
 		);
 		const equipment = await pool.query(
 			`SELECT e.*, u.email AS submitted_by
              FROM equipment e
-             LEFT JOIN users u ON u.id = e.created_by
+             LEFT JOIN profiles u ON u.id = e.created_by
              WHERE e.status = 'pending'
              ORDER BY e.created_at DESC`
 		);
 		const suggestions = await pool.query(
-			`SELECT ge.*, 
+			`SELECT ge.*,
                 g.name AS gym_name,
                 CONCAT(e.brand, ' ', e.name) AS equipment_name,
                 u.email AS submitted_by
              FROM gym_equipment ge
              JOIN gyms g ON g.id = ge.gym_id
              JOIN equipment e ON e.id = ge.equipment_id
-             LEFT JOIN users u ON u.id = ge.created_by
+             LEFT JOIN profiles u ON u.id = ge.created_by
              WHERE ge.status = 'pending'
              ORDER BY ge.created_at DESC`
 		);
@@ -72,7 +67,11 @@ router.post('/approve/gym/:id', async (req, res) => {
 
 		const gym = result.rows[0];
 		if (gym.created_by) {
-			await notify(gym.created_by, 'gym_approved', `Your gym "${gym.name}" was approved!`, gym.id);
+			try {
+				await createNotification(pool, gym.created_by, 'gym_approved', gym.id, 'Your gym submission was approved');
+			} catch (notifyErr) {
+				console.error('APPROVE GYM NOTIFICATION ERROR:', notifyErr);
+			}
 		}
 		res.json({ data: gym });
 	} catch (err) {
@@ -89,7 +88,16 @@ router.post('/reject/gym/:id', async (req, res) => {
 			[req.params.id]
 		);
 		if (!result.rows[0]) return res.status(404).json({ error: 'Gym not found' });
-		res.json({ data: result.rows[0] });
+
+		const gym = result.rows[0];
+		if (gym.created_by) {
+			try {
+				await createNotification(pool, gym.created_by, 'gym_rejected', gym.id, 'Your gym submission was not approved');
+			} catch (notifyErr) {
+				console.error('REJECT GYM NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: gym });
 	} catch (err) {
 		console.error('REJECT GYM ERROR:', err);
 		res.status(500).json({ error: 'Failed to reject gym' });
@@ -107,12 +115,11 @@ router.post('/approve/suggestion/:id', async (req, res) => {
 
 		const sugg = result.rows[0];
 		if (sugg.created_by) {
-			await notify(
-				sugg.created_by,
-				'suggestion_approved',
-				`Your equipment suggestion was approved!`,
-				sugg.id
-			);
+			try {
+				await createNotification(pool, sugg.created_by, 'suggestion_approved', sugg.id, 'Your equipment suggestion was approved!');
+			} catch (notifyErr) {
+				console.error('APPROVE SUGGESTION NOTIFICATION ERROR:', notifyErr);
+			}
 		}
 		res.json({ data: sugg });
 	} catch (err) {
@@ -147,12 +154,11 @@ router.post('/approve/equipment/:id', async (req, res) => {
 
 		const eq = result.rows[0];
 		if (eq.created_by) {
-			await notify(
-				eq.created_by,
-				'equipment_approved',
-				`Your equipment "${eq.brand} ${eq.name}" was approved!`,
-				eq.id
-			);
+			try {
+				await createNotification(pool, eq.created_by, 'equipment_approved', eq.id, 'Your equipment submission was approved');
+			} catch (notifyErr) {
+				console.error('APPROVE EQUIPMENT NOTIFICATION ERROR:', notifyErr);
+			}
 		}
 		res.json({ data: eq });
 	} catch (err) {
@@ -169,7 +175,16 @@ router.post('/reject/equipment/:id', async (req, res) => {
 			[req.params.id]
 		);
 		if (!result.rows[0]) return res.status(404).json({ error: 'Equipment not found' });
-		res.json({ data: result.rows[0] });
+
+		const equipment = result.rows[0];
+		if (equipment.created_by) {
+			try {
+				await createNotification(pool, equipment.created_by, 'equipment_rejected', equipment.id, 'Your equipment submission was not approved');
+			} catch (notifyErr) {
+				console.error('REJECT EQUIPMENT NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: equipment });
 	} catch (err) {
 		console.error('REJECT EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to reject equipment' });
@@ -180,7 +195,7 @@ router.post('/reject/equipment/:id', async (req, res) => {
 router.post('/make-admin/:userId', superAdminMiddleware, async (req, res) => {
 	try {
 		const result = await pool.query(
-			`UPDATE users SET role = 'admin' WHERE id = $1 RETURNING id, email, role`,
+			`UPDATE profiles SET role = 'admin' WHERE id = $1 RETURNING id, email, username, role`,
 			[req.params.userId]
 		);
 		if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });

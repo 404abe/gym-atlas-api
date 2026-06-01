@@ -3,17 +3,25 @@ const router = express.Router();
 const pool = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 
+async function createNotification(pool, userId, type, relatedId, message) {
+	await pool.query(
+		`INSERT INTO notifications (user_id, type, related_id, message, read)
+         VALUES ($1, $2, $3, $4, false)`,
+		[userId, type, relatedId, message]
+	);
+}
+
 // GET /notifications - get user's notifications
 router.get('/', authMiddleware, async (req, res) => {
 	try {
 		const result = await pool.query(
-			`SELECT * FROM notifications 
-             WHERE user_id = $1 
-             ORDER BY created_at DESC 
+			`SELECT * FROM notifications
+             WHERE user_id = $1
+             ORDER BY created_at DESC
              LIMIT 50`,
 			[req.user.id]
 		);
-		res.json({ data: result.rows });
+		res.json({ data: { notifications: result.rows } });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ error: 'Failed to fetch notifications' });
@@ -47,4 +55,4 @@ router.post('/:id/read', authMiddleware, async (req, res) => {
 	}
 });
 
-module.exports = router;
+module.exports = { router, createNotification };
