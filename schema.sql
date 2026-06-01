@@ -37,7 +37,8 @@ CREATE TABLE public.equipment (
     series text,
     image_url text,
     status text DEFAULT 'approved'::text NOT NULL,
-    created_by integer
+    created_by integer,
+    resistance_profile text DEFAULT 'constant'::text
 );
 
 
@@ -86,7 +87,8 @@ ALTER SEQUENCE public.equipment_categories_id_seq OWNED BY public.equipment_cate
 CREATE TABLE public.equipment_favourites (
     user_id integer NOT NULL,
     equipment_id integer NOT NULL,
-    created_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT equipment_favourites_user_equipment_unique UNIQUE (user_id, equipment_id)
 );
 
 
