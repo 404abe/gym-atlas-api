@@ -3,9 +3,11 @@ const pool = require('../db');
 const getGyms = async (userId = null) => {
 	const result = await pool.query(
 		`
-        SELECT 
+        SELECT
             g.id,
             g.name,
+            g.city,
+            g.country,
             g.image_url,
             g.latitude AS lat,
             g.longitude AS lng,
