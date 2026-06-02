@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const { authMiddleware: auth } = require('../middleware/auth');
+const { authMiddleware: auth, optionalAuth } = require('../middleware/auth');
 
 router.get('/:id/stats', auth, async (req, res) => {
 	const userId = req.params.id;
@@ -88,8 +88,21 @@ router.get('/:id/favourites/equipment', auth, async (req, res) => {
 	}
 });
 
+// POST /users/sync — upsert profile for the authenticated user (call after OAuth sign-in)
+router.post('/sync', auth, async (req, res) => {
+	try {
+		const result = await pool.query(
+			'SELECT id, username, email, role, created_at FROM profiles WHERE id = $1',
+			[req.user.id]
+		);
+		res.json({ data: result.rows[0] });
+	} catch (err) {
+		res.status(500).json({ error: 'Failed to sync user' });
+	}
+});
+
 // /:id must always be last
-router.get('/:id', async (req, res) => {
+router.get('/:id', optionalAuth, async (req, res) => {
 	try {
 		const result = await pool.query(
 			`SELECT
