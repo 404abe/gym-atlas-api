@@ -49,7 +49,15 @@ router.get('/pending', async (req, res) => {
              WHERE ge.status = 'pending'
              ORDER BY ge.created_at DESC`
 		);
-		res.json({ data: { gyms: gyms.rows, equipment: equipment.rows, suggestions: suggestions.rows } });
+		const photos = await pool.query(
+			`SELECT e.id, e.brand, e.series, e.name, e.image_url, e.photo_uploaded_at,
+                u.email AS submitted_by
+             FROM equipment e
+             LEFT JOIN profiles u ON u.id = e.photo_uploaded_by
+             WHERE e.photo_status = 'pending' AND e.status = 'approved' AND e.image_url IS NOT NULL
+             ORDER BY e.photo_uploaded_at DESC`
+		);
+		res.json({ data: { gyms: gyms.rows, equipment: equipment.rows, suggestions: suggestions.rows, photos: photos.rows } });
 	} catch (err) {
 		console.error('GET PENDING ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch pending submissions' });
@@ -188,6 +196,47 @@ router.post('/reject/equipment/:id', async (req, res) => {
 	} catch (err) {
 		console.error('REJECT EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to reject equipment' });
+	}
+});
+
+// POST /admin/approve/photo/:id
+router.post('/approve/photo/:id', async (req, res) => {
+	try {
+		const result = await pool.query(
+			`UPDATE equipment SET photo_status = 'approved' WHERE id = $1 RETURNING *`,
+			[req.params.id]
+		);
+		if (!result.rows[0]) return res.status(404).json({ error: 'Equipment not found' });
+
+		const eq = result.rows[0];
+		if (eq.photo_uploaded_by) {
+			try {
+				await createNotification(pool, eq.photo_uploaded_by, 'equipment_approved', eq.id, 'Your photo submission was approved');
+			} catch (notifyErr) {
+				console.error('APPROVE PHOTO NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: eq });
+	} catch (err) {
+		console.error('APPROVE PHOTO ERROR:', err);
+		res.status(500).json({ error: 'Failed to approve photo' });
+	}
+});
+
+// POST /admin/reject/photo/:id
+router.post('/reject/photo/:id', async (req, res) => {
+	try {
+		const result = await pool.query(
+			`UPDATE equipment
+             SET image_url = NULL, photo_uploaded_by = NULL, photo_uploaded_at = NULL, photo_status = NULL
+             WHERE id = $1 RETURNING *`,
+			[req.params.id]
+		);
+		if (!result.rows[0]) return res.status(404).json({ error: 'Equipment not found' });
+		res.json({ data: result.rows[0] });
+	} catch (err) {
+		console.error('REJECT PHOTO ERROR:', err);
+		res.status(500).json({ error: 'Failed to reject photo' });
 	}
 });
 

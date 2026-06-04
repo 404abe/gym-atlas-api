@@ -128,7 +128,7 @@ const getSeriesByBrand = async (brand) => {
 	return result.rows.map((r) => r.series);
 };
 
-const uploadEquipmentImage = async (id, fileBuffer) => {
+const uploadEquipmentImage = async (id, fileBuffer, userId = null) => {
 	const result = await new Promise((resolve, reject) => {
 		cloudinary.uploader
 			.upload_stream({ folder: 'gym-atlas/equipment', resource_type: 'image' }, (error, result) => {
@@ -138,7 +138,10 @@ const uploadEquipmentImage = async (id, fileBuffer) => {
 			.end(fileBuffer);
 	});
 
-	await pool.query('UPDATE equipment SET image_url = $1 WHERE id = $2', [result.secure_url, id]);
+	await pool.query(
+		'UPDATE equipment SET image_url = $1, photo_uploaded_by = $2, photo_uploaded_at = NOW(), photo_status = \'pending\' WHERE id = $3',
+		[result.secure_url, userId, id]
+	);
 	return result.secure_url;
 };
 
