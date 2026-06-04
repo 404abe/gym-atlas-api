@@ -21,6 +21,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Health check for Render cold-start polling
+app.get('/health', (_req, res) => res.json({ ok: true }));
+
 // Route definitions
 app.use('/admin', adminRoutes);
 app.use('/leaderboard', leaderboardRoutes);
