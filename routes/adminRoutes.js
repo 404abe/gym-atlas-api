@@ -24,14 +24,14 @@ router.get('/users', superAdminMiddleware, async (req, res) => {
 router.get('/pending', async (req, res) => {
 	try {
 		const gyms = await pool.query(
-			`SELECT g.*, u.email AS submitted_by
+			`SELECT g.*, u.username AS submitted_by
              FROM gyms g
              LEFT JOIN profiles u ON u.id = g.created_by
              WHERE g.status = 'pending'
              ORDER BY g.created_at DESC`
 		);
 		const equipment = await pool.query(
-			`SELECT e.*, u.email AS submitted_by
+			`SELECT e.*, u.username AS submitted_by
              FROM equipment e
              LEFT JOIN profiles u ON u.id = e.created_by
              WHERE e.status = 'pending'
@@ -41,7 +41,8 @@ router.get('/pending', async (req, res) => {
 			`SELECT ge.*,
                 g.name AS gym_name,
                 CONCAT(e.brand, ' ', e.name) AS equipment_name,
-                u.email AS submitted_by
+                e.image_url AS equipment_image_url,
+                u.username AS submitted_by
              FROM gym_equipment ge
              JOIN gyms g ON g.id = ge.gym_id
              JOIN equipment e ON e.id = ge.equipment_id
@@ -51,7 +52,7 @@ router.get('/pending', async (req, res) => {
 		);
 		const photos = await pool.query(
 			`SELECT e.id, e.brand, e.series, e.name, e.image_url, e.photo_uploaded_at,
-                u.email AS submitted_by
+                u.username AS submitted_by
              FROM equipment e
              LEFT JOIN profiles u ON u.id = e.photo_uploaded_by
              WHERE e.photo_status = 'pending' AND e.status = 'approved' AND e.image_url IS NOT NULL
