@@ -101,6 +101,24 @@ router.post('/sync', auth, async (req, res) => {
 	}
 });
 
+router.get('/by-username/:username', optionalAuth, async (req, res) => {
+	try {
+		const result = await pool.query(
+			`SELECT
+				u.id, u.username, u.created_at,
+				(SELECT COUNT(*) FROM gym_ratings       WHERE user_id = u.id)::int AS gyms_rated,
+				(SELECT COUNT(*) FROM equipment_ratings WHERE user_id = u.id)::int AS equipment_rated
+			 FROM profiles u
+			 WHERE u.username = $1`,
+			[req.params.username]
+		);
+		if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
+		res.json({ data: result.rows[0] });
+	} catch (err) {
+		res.status(500).json({ error: 'Failed to fetch user' });
+	}
+});
+
 // /:id must always be last
 router.get('/:id', optionalAuth, async (req, res) => {
 	try {
