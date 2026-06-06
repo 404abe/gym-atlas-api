@@ -117,13 +117,14 @@ const createGym = async (
 const getGymEquipment = async (gymId) => {
 	const result = await pool.query(
 		`
-		SELECT 
+		SELECT
 			e.id AS equipment_id,
 			e.brand,
 			e.series,
 			e.name,
 			CONCAT_WS(' ', e.brand, e.series, e.name) AS full_name,
-			ge.quantity
+			ge.quantity,
+			e.image_url
 		FROM gym_equipment ge
 		JOIN equipment e ON ge.equipment_id = e.id
 		WHERE ge.gym_id = $1 AND ge.status = 'approved'
