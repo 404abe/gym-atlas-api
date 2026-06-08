@@ -3,7 +3,17 @@ const router = express.Router();
 const equipmentController = require('../controllers/equipmentController');
 const { authMiddleware, optionalAuth } = require('../middleware/auth');
 const multer = require('multer');
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+	storage: multer.memoryStorage(),
+	limits: { fileSize: 5 * 1024 * 1024 },
+	fileFilter: (_req, file, cb) => {
+		if (file.mimetype.startsWith('image/')) {
+			cb(null, true);
+		} else {
+			cb(new Error('Only images allowed'));
+		}
+	}
+});
 
 // ── Image upload ──────────────────────────────────────────────────────────────
 router.post(
@@ -30,5 +40,12 @@ router.delete('/:id/favourite', authMiddleware, equipmentController.removeFavour
 
 // ── Single resource (must be last) ────────────────────────────────────────────
 router.get('/:id', optionalAuth, equipmentController.getEquipmentById);
+
+router.use((err, _req, res, next) => {
+	if (err.code === 'LIMIT_FILE_SIZE') {
+		return res.status(400).json({ error: 'File too large. Max 5MB.' });
+	}
+	next(err);
+});
 
 module.exports = router;

@@ -7,7 +7,17 @@ const pool = require('../db');
 const multer = require('multer');
 // const cloudinary = require('../config/cloudinary'); // CLOUDINARY — commented out, using Azure
 const { uploadToAzure } = require('../config/azureStorage');
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+	storage: multer.memoryStorage(),
+	limits: { fileSize: 5 * 1024 * 1024 },
+	fileFilter: (_req, file, cb) => {
+		if (file.mimetype.startsWith('image/')) {
+			cb(null, true);
+		} else {
+			cb(new Error('Only images allowed'));
+		}
+	}
+});
 
 router.get('/', optionalAuth, gymController.getGyms);
 router.get('/stats', gymController.getGymStats);
@@ -48,5 +58,12 @@ router.delete('/:gymId/equipment/:equipmentId', gymController.removeGymEquipment
 router.delete('/:id/favourite', auth, gymController.removeFavouriteGym);
 
 router.get('/:id', gymController.getGymById);
+
+router.use((err, _req, res, next) => {
+	if (err.code === 'LIMIT_FILE_SIZE') {
+		return res.status(400).json({ error: 'File too large. Max 5MB.' });
+	}
+	next(err);
+});
 
 module.exports = router;
