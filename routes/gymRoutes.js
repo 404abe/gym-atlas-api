@@ -5,7 +5,8 @@ const { authMiddleware: auth, authMiddleware } = require('../middleware/auth');
 const { optionalAuth } = require('../middleware/auth');
 const pool = require('../db');
 const multer = require('multer');
-const cloudinary = require('../config/cloudinary');
+// const cloudinary = require('../config/cloudinary'); // CLOUDINARY — commented out, using Azure
+const { uploadToAzure } = require('../config/azureStorage');
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/', optionalAuth, gymController.getGyms);
@@ -21,19 +22,22 @@ router.post('/:id/favourite', auth, gymController.favouriteGym);
 router.post('/:id/image', authMiddleware, upload.single('image'), async (req, res) => {
 	try {
 		if (!req.file) return res.status(400).json({ error: 'No image provided' });
-		const result = await new Promise((resolve, reject) => {
-			cloudinary.uploader
-				.upload_stream({ folder: 'gym-atlas/gyms', resource_type: 'image' }, (error, result) => {
-					if (error) reject(error);
-					else resolve(result);
-				})
-				.end(req.file.buffer);
-		});
-		await pool.query('UPDATE gyms SET image_url = $1 WHERE id = $2', [
-			result.secure_url,
-			req.params.id
-		]);
-		res.json({ data: { image_url: result.secure_url } });
+
+		// CLOUDINARY version — commented out, using Azure below
+		// const result = await new Promise((resolve, reject) => {
+		// 	cloudinary.uploader
+		// 		.upload_stream({ folder: 'gym-atlas/gyms', resource_type: 'image' }, (error, result) => {
+		// 			if (error) reject(error);
+		// 			else resolve(result);
+		// 		})
+		// 		.end(req.file.buffer);
+		// });
+		// await pool.query('UPDATE gyms SET image_url = $1 WHERE id = $2', [result.secure_url, req.params.id]);
+		// res.json({ data: { image_url: result.secure_url } });
+
+		const url = await uploadToAzure(req.file.buffer, req.file.mimetype, 'gyms');
+		await pool.query('UPDATE gyms SET image_url = $1 WHERE id = $2', [url, req.params.id]);
+		res.json({ data: { image_url: url } });
 	} catch (err) {
 		console.error('IMAGE UPLOAD ERROR:', err);
 		res.status(500).json({ error: 'Failed to upload image' });

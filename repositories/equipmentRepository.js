@@ -1,5 +1,6 @@
 const pool = require('../db');
-const cloudinary = require('../config/cloudinary');
+// const cloudinary = require('../config/cloudinary'); // CLOUDINARY — commented out, using Azure
+const { uploadToAzure } = require('../config/azureStorage');
 
 // CREATE new equipment (catalog)
 const createEquipment = async (brand, series, name, type, createdBy = null, resistanceProfile = 'constant') => {
@@ -128,21 +129,30 @@ const getSeriesByBrand = async (brand) => {
 	return result.rows.map((r) => r.series);
 };
 
-const uploadEquipmentImage = async (id, fileBuffer, userId = null) => {
-	const result = await new Promise((resolve, reject) => {
-		cloudinary.uploader
-			.upload_stream({ folder: 'gym-atlas/equipment', resource_type: 'image' }, (error, result) => {
-				if (error) reject(error);
-				else resolve(result);
-			})
-			.end(fileBuffer);
-	});
+// CLOUDINARY version — commented out, using Azure below
+// const uploadEquipmentImage = async (id, fileBuffer, userId = null) => {
+// 	const result = await new Promise((resolve, reject) => {
+// 		cloudinary.uploader
+// 			.upload_stream({ folder: 'gym-atlas/equipment', resource_type: 'image' }, (error, result) => {
+// 				if (error) reject(error);
+// 				else resolve(result);
+// 			})
+// 			.end(fileBuffer);
+// 	});
+// 	await pool.query(
+// 		'UPDATE equipment SET image_url = $1, photo_uploaded_by = $2, photo_uploaded_at = NOW(), photo_status = \'pending\' WHERE id = $3',
+// 		[result.secure_url, userId, id]
+// 	);
+// 	return result.secure_url;
+// };
 
+const uploadEquipmentImage = async (id, fileBuffer, mimeType, userId = null) => {
+	const url = await uploadToAzure(fileBuffer, mimeType, 'equipment');
 	await pool.query(
 		'UPDATE equipment SET image_url = $1, photo_uploaded_by = $2, photo_uploaded_at = NOW(), photo_status = \'pending\' WHERE id = $3',
-		[result.secure_url, userId, id]
+		[url, userId, id]
 	);
-	return result.secure_url;
+	return url;
 };
 
 const rateEquipment = async (userId, equipmentId, rating) => {

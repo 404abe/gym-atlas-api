@@ -36,9 +36,9 @@ const getSeriesByBrand = async (brand) => {
 	return await equipmentRepo.getSeriesByBrand(brand);
 };
 
-const uploadEquipmentImage = async (id, fileBuffer, userId = null) => {
+const uploadEquipmentImage = async (id, fileBuffer, mimeType, userId = null) => {
 	if (!fileBuffer) throw new Error('No image provided');
-	return await equipmentRepo.uploadEquipmentImage(id, fileBuffer, userId);
+	return await equipmentRepo.uploadEquipmentImage(id, fileBuffer, mimeType, userId);
 };
 
 const rateEquipment = async (userId, equipmentId, rating) => {

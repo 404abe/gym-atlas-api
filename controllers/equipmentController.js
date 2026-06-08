@@ -98,7 +98,7 @@ const getSeriesByBrand = async (req, res) => {
 const uploadEquipmentImage = async (req, res) => {
 	try {
 		const userId = req.user?.id || null;
-		const image_url = await equipmentService.uploadEquipmentImage(req.params.id, req.file?.buffer, userId);
+		const image_url = await equipmentService.uploadEquipmentImage(req.params.id, req.file?.buffer, req.file?.mimetype, userId);
 		res.json({ data: { image_url } });
 	} catch (err) {
 		if (err.message === 'No image provided') {
