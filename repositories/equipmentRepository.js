@@ -76,6 +76,7 @@ const getGymsByEquipmentSlug = async (slug) => {
 		JOIN equipment e ON e.id = ge.equipment_id
 		WHERE e.slug = $1
 		AND g.status = 'approved'
+		AND ge.status = 'approved'
 		ORDER BY ge.quantity DESC
 		`,
 		[slug]
