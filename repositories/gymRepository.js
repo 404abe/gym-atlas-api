@@ -147,7 +147,7 @@ const addGymEquipment = async (
 		`INSERT INTO gym_equipment (gym_id, equipment_id, quantity, notes, status, created_by)
          VALUES ($1, $2, $3, $4, $5, $6)
          ON CONFLICT (gym_id, equipment_id)
-         DO UPDATE SET quantity = EXCLUDED.quantity, notes = EXCLUDED.notes, status = EXCLUDED.status
+         DO UPDATE SET quantity = EXCLUDED.quantity, notes = EXCLUDED.notes, status = EXCLUDED.status, created_by = EXCLUDED.created_by
          RETURNING *`,
 		[gymId, equipmentId, quantity, notes, status, createdBy]
 	);

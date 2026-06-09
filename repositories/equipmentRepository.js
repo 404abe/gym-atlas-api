@@ -25,7 +25,7 @@ const getEquipmentById = async (id, userId = null) => {
 	const result = await pool.query(
 		`
 		SELECT
-			e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status,
+			e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
 			e.resistance_profile,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating,
@@ -34,7 +34,7 @@ const getEquipmentById = async (id, userId = null) => {
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
 		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
 		WHERE e.id = $1
-		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status, e.resistance_profile
+		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile
 		`,
 		[id, userId]
 	);
@@ -45,7 +45,7 @@ const getAllEquipment = async (userId = null) => {
 	const result = await pool.query(
 		`
 		SELECT
-			e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status,
+			e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
 			e.resistance_profile,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating,
@@ -54,7 +54,7 @@ const getAllEquipment = async (userId = null) => {
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
 		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
 		WHERE e.status = 'approved'
-		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.created_at, e.image_url, e.status, e.resistance_profile
+		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile
 		ORDER BY e.brand, e.name
 		`,
 		[userId]
