@@ -37,6 +37,7 @@ router.get('/:slug/gyms', equipmentController.getGymsWithEquipment);
 router.post('/:id/rate', authMiddleware, equipmentController.rateEquipment);
 router.post('/:id/favourite', authMiddleware, equipmentController.favouriteEquipment);
 router.delete('/:id/favourite', authMiddleware, equipmentController.removeFavouriteEquipment);
+router.patch('/:id/weight-stack', authMiddleware, equipmentController.updateWeightStack);
 
 // ── Single resource (must be last) ────────────────────────────────────────────
 router.get('/:id', optionalAuth, equipmentController.getEquipmentById);

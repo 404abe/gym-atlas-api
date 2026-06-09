@@ -148,6 +148,22 @@ const removeFavouriteEquipment = async (req, res) => {
 	}
 };
 
+const updateWeightStack = async (req, res) => {
+	try {
+		const { weight_stack } = req.body;
+		const value = weight_stack === null ? null : parseInt(weight_stack, 10);
+		if (value !== null && (isNaN(value) || value <= 0)) {
+			return res.status(400).json({ error: 'Invalid weight stack value' });
+		}
+		const result = await equipmentService.updateWeightStack(req.params.id, value);
+		if (!result) return res.status(404).json({ error: 'Equipment not found or not pin loaded' });
+		res.json({ data: result });
+	} catch (err) {
+		console.error('UPDATE WEIGHT STACK ERROR:', err);
+		res.status(500).json({ error: 'Failed to update weight stack' });
+	}
+};
+
 module.exports = {
 	getAllEquipment,
 	getEquipmentById,
@@ -159,5 +175,6 @@ module.exports = {
 	uploadEquipmentImage,
 	rateEquipment,
 	favouriteEquipment,
-	removeFavouriteEquipment
+	removeFavouriteEquipment,
+	updateWeightStack
 };

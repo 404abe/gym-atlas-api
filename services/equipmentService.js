@@ -56,6 +56,10 @@ const removeFavouriteEquipment = async (userId, equipmentId) => {
 	return await equipmentRepo.removeFavouriteEquipment(userId, equipmentId);
 };
 
+const updateWeightStack = async (id, weightStack) => {
+	return await equipmentRepo.updateWeightStack(id, weightStack);
+};
+
 module.exports = {
 	getAllEquipment,
 	getEquipmentById,
@@ -67,5 +71,6 @@ module.exports = {
 	uploadEquipmentImage,
 	rateEquipment,
 	favouriteEquipment,
-	removeFavouriteEquipment
+	removeFavouriteEquipment,
+	updateWeightStack
 };

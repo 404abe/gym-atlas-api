@@ -195,6 +195,14 @@ const removeFavouriteEquipment = async (userId, equipmentId) => {
 	return result.rows[0] || null;
 };
 
+const updateWeightStack = async (id, weightStack) => {
+	const result = await pool.query(
+		`UPDATE equipment SET weight_stack = $1 WHERE id = $2 AND type = 'pin_loaded' RETURNING id, weight_stack`,
+		[weightStack, id]
+	);
+	return result.rows[0] || null;
+};
+
 module.exports = {
 	getEquipmentById,
 	getAllEquipment,
@@ -207,5 +215,6 @@ module.exports = {
 	rateEquipment,
 	favouriteEquipment,
 	removeFavouriteEquipment,
-	searchEquipmentByName
+	searchEquipmentByName,
+	updateWeightStack
 };
