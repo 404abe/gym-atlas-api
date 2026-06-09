@@ -14,8 +14,15 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-	origin: process.env.CORS_ORIGIN?.split(',') || 'http://localhost:3001'
-};
+	origin: function(origin, callback) {
+	  const allowed = process.env.CORS_ORIGIN?.split(',') || [];
+	  if (!origin || allowed.includes(origin) || origin.endsWith('.vercel.app')) {
+		callback(null, true);
+	  } else {
+		callback(new Error('Not allowed by CORS'));
+	  }
+	}
+  };
 
 // Middleware
 app.use(cors(corsOptions));
