@@ -1,3 +1,4 @@
+[![](https://raw.githubusercontent.com/404abe/gym-atlas-api/main/gymatlas-api-banner.png)]
 # Gym Atlas APi 🏋️
 
 [![Node.js](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
