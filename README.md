@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 [![](https://raw.githubusercontent.com/404abe/gym-atlas-api/main/gymatlas%20api%20banner.png)]# Gym Atlas APi 🏋️
+=======
+[![](https://raw.githubusercontent.com/404abe/gym-atlas-api/main/gymatlas%20api%20banner.png)](https://github.com/404abe/gym-atlas-api)
+
+# Gym Atlas API
+>>>>>>> b59acf3 (docs: README updated)
 
 [![Node.js](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Supabase](https://img.shields.io/badge/supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 [![Docker](https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Express](https://img.shields.io/badge/express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](#)
@@ -18,13 +25,15 @@ Builds a structured database of gym machines using user-contributed data, enabli
 ## Features
 
 - Structured equipment catalog (brands, series, machine types, images)
-- Gym ↔ equipment mapping with quantity tracking
-- Community submissions with admin approval flow
-- Equipment and gym ratings
-- Favourites for gyms and equipment
+- Gym ↔ equipment mapping with community submissions and admin approval flow
+- Equipment and gym ratings and favourites
+- Weight stack tracking for pin-loaded machines
+- Best-in-class equipment selections per category
+- In-app notifications for submission approvals/rejections
 - Leaderboard tracking user contributions
-- JWT authentication with role-based access (user, admin, super_admin)
-- REST API for querying gyms and equipment
+- Image uploads via Azure Blob Storage (gyms and equipment)
+- Supabase JWT authentication with role-based access (`user`, `admin`, `super_admin`)
+- REST API with optional auth for public queries
 
 ---
 
@@ -35,9 +44,22 @@ routes/       → Express route definitions
 controllers/  → Request/response handling
 services/     → Business logic
 repositories/ → Database queries
-middleware/   → Auth middleware
-config/       → External service config (Cloudinary)
+middleware/   → Auth middleware (Supabase JWT)
+config/       → External service config (Azure Blob Storage)
 ```
+
+### Endpoints
+
+| Prefix | Description |
+|---|---|
+| `GET /health` | Health check |
+| `/gyms` | Gym discovery, equipment mapping, ratings, favourites, image upload |
+| `/equipment` | Equipment catalog, ratings, favourites, weight stack, image upload |
+| `/users` | User profiles, stats, contribution history |
+| `/leaderboard` | Top contributors and per-user contribution details |
+| `/notifications` | User notification inbox |
+| `/best-in-class` | User's best-in-class equipment selections per category |
+| `/admin` | Pending submission review and user role management |
 
 ---
 
@@ -47,6 +69,26 @@ config/       → External service config (Cloudinary)
 
 - Node.js
 - Docker
+- A [Supabase](https://supabase.com/) project (for auth)
+- An Azure Storage account (for image uploads)
+
+### Environment Variables
+
+Copy the example env file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SUPABASE_URL` | Your Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (for JWT verification) |
+| `AZURE_STORAGE_CONNECTION_STRING` | Azure Blob Storage connection string |
+| `AZURE_STORAGE_CONTAINER_NAME` | Container name for uploaded images |
+| `CORS_ORIGIN` | Comma-separated list of allowed origins (e.g. `http://localhost:3000`) |
+| `PORT` | Server port (defaults to `3000`) |
 
 ### Setup
 
@@ -56,31 +98,25 @@ config/       → External service config (Cloudinary)
 npm install
 ```
 
-2. Copy the example env file and fill in your values:
-
-```bash
-cp .env.example .env
-```
-
-3. Start the database:
+2. Start the database:
 
 ```bash
 docker-compose up -d
 ```
 
-4. Set up the schema:
+3. Set up the schema:
 
 ```bash
 docker exec -i gym-db psql -U postgres -d gymapp < schema.sql
 ```
 
-5. Seed the database with sample data:
+4. Seed the database with sample data:
 
 ```bash
 node seed.js
 ```
 
-6. Start the server:
+5. Start the server:
 
 ```bash
 node server.js
@@ -98,7 +134,7 @@ npm test
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 See [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for guidelines.
 
