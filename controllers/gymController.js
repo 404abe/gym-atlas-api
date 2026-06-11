@@ -62,10 +62,9 @@ const addGymEquipment = async (req, res) => {
 	try {
 		const { gymId } = req.params;
 		const { equipment_id, quantity, notes } = req.body;
-		const isAdmin = req.user?.role === 'admin' || req.user?.role === 'super_admin';
-		const status = isAdmin ? 'approved' : 'pending';
+		const isSuperAdmin = req.user?.role === 'super_admin';
+		const status = isSuperAdmin ? 'approved' : 'pending';
 		const createdBy = req.user?.id || null;
-		console.log('createdBy value: ', createdBy);
 
 		const result = await gymService.addGymEquipment(
 			gymId,

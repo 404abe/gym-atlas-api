@@ -69,7 +69,15 @@ CREATE TABLE public.equipment (
     image_url text,
     status text NOT NULL DEFAULT 'approved'::text,
     created_by UUID,
-    resistance_profile text DEFAULT 'constant'::text
+    resistance_profile text DEFAULT 'constant'::text,
+    pending_image_url text,
+    photo_status text,
+    photo_uploaded_by UUID,
+    photo_uploaded_at timestamp without time zone,
+    weight_stack integer,
+    pending_weight_stack integer,
+    weight_stack_status text,
+    weight_stack_submitted_by UUID
 );
 
 ALTER TABLE public.equipment OWNER TO postgres;
@@ -99,7 +107,11 @@ CREATE TABLE public.gyms (
     instagram character varying(255),
     image_url text,
     status text NOT NULL DEFAULT 'approved'::text,
-    created_by UUID
+    created_by UUID,
+    pending_image_url text,
+    photo_status text,
+    photo_uploaded_by UUID,
+    photo_uploaded_at timestamp without time zone
 );
 
 ALTER TABLE public.gyms OWNER TO postgres;

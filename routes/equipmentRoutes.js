@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const equipmentController = require('../controllers/equipmentController');
-const { authMiddleware, optionalAuth } = require('../middleware/auth');
+const { authMiddleware, optionalAuth, adminMiddleware } = require('../middleware/auth');
 const multer = require('multer');
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -38,6 +38,11 @@ router.post('/:id/rate', authMiddleware, equipmentController.rateEquipment);
 router.post('/:id/favourite', authMiddleware, equipmentController.favouriteEquipment);
 router.delete('/:id/favourite', authMiddleware, equipmentController.removeFavouriteEquipment);
 router.patch('/:id/weight-stack', authMiddleware, equipmentController.updateWeightStack);
+
+// ── Variants ──────────────────────────────────────────────────────────────────
+router.get('/:id/variants', equipmentController.getVariants);
+router.post('/:id/variants', authMiddleware, equipmentController.createVariant);
+router.delete('/variants/:variantId', authMiddleware, adminMiddleware, equipmentController.deleteVariant);
 
 // ── Single resource (must be last) ────────────────────────────────────────────
 router.get('/:id', optionalAuth, equipmentController.getEquipmentById);
