@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const gymController = require('../controllers/gymController');
-const { authMiddleware: auth, authMiddleware } = require('../middleware/auth');
+const { authMiddleware: auth, authMiddleware, adminMiddleware } = require('../middleware/auth');
 const { optionalAuth } = require('../middleware/auth');
+const { createNotification } = require('./notificationsRoutes');
+const gymRepo = require('../repositories/gymRepository');
 const pool = require('../db');
 const multer = require('multer');
 // const cloudinary = require('../config/cloudinary'); // CLOUDINARY — commented out, using Azure
@@ -33,28 +35,26 @@ router.post('/:id/image', authMiddleware, upload.single('image'), async (req, re
 	try {
 		if (!req.file) return res.status(400).json({ error: 'No image provided' });
 
-		// CLOUDINARY version — commented out, using Azure below
-		// const result = await new Promise((resolve, reject) => {
-		// 	cloudinary.uploader
-		// 		.upload_stream({ folder: 'gym-atlas/gyms', resource_type: 'image' }, (error, result) => {
-		// 			if (error) reject(error);
-		// 			else resolve(result);
-		// 		})
-		// 		.end(req.file.buffer);
-		// });
-		// await pool.query('UPDATE gyms SET image_url = $1 WHERE id = $2', [result.secure_url, req.params.id]);
-		// res.json({ data: { image_url: result.secure_url } });
-
 		const url = await uploadToAzure(req.file.buffer, req.file.mimetype, 'gyms');
-		await pool.query('UPDATE gyms SET image_url = $1 WHERE id = $2', [url, req.params.id]);
-		res.json({ data: { image_url: url } });
+		// First photo goes live instantly; a replacement is staged as pending until an admin approves.
+		const result = await gymRepo.uploadGymImage(req.params.id, url, req.user?.id || null);
+		if (!result) return res.status(404).json({ error: 'Gym not found' });
+
+		if (result.photo_status === 'pending' && req.user?.id) {
+			try {
+				await createNotification(pool, req.user.id, 'submission_received', req.params.id, 'Your gym photo update is under review');
+			} catch (notifyErr) {
+				console.error('GYM PHOTO NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: { image_url: result.image_url, status: result.photo_status } });
 	} catch (err) {
 		console.error('IMAGE UPLOAD ERROR:', err);
 		res.status(500).json({ error: 'Failed to upload image' });
 	}
 });
 
-router.delete('/:gymId/equipment/:equipmentId', gymController.removeGymEquipment);
+router.delete('/:gymId/equipment/:equipmentId', authMiddleware, adminMiddleware, gymController.removeGymEquipment);
 router.delete('/:id/favourite', auth, gymController.removeFavouriteGym);
 
 router.get('/:id', gymController.getGymById);

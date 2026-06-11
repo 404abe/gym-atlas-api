@@ -56,8 +56,28 @@ const removeFavouriteEquipment = async (userId, equipmentId) => {
 	return await equipmentRepo.removeFavouriteEquipment(userId, equipmentId);
 };
 
-const updateWeightStack = async (id, weightStack) => {
-	return await equipmentRepo.updateWeightStack(id, weightStack);
+const updateWeightStack = async (id, weightStack, submittedBy = null) => {
+	return await equipmentRepo.updateWeightStack(id, weightStack, submittedBy);
+};
+
+const VARIATION_TYPES = ['grip', 'unilateral', 'incline'];
+
+const getVariants = async (equipmentId) => {
+	return await equipmentRepo.getVariantsByEquipmentId(equipmentId);
+};
+
+const createVariant = async (equipmentId, label, variationType, isDefault = false, createdBy = null) => {
+	if (!label || !variationType) {
+		throw new Error('label and variation_type are required');
+	}
+	if (!VARIATION_TYPES.includes(variationType)) {
+		throw new Error('Invalid variation_type');
+	}
+	return await equipmentRepo.createVariant(equipmentId, label, variationType, Boolean(isDefault), createdBy);
+};
+
+const deleteVariant = async (variantId) => {
+	return await equipmentRepo.deleteVariant(variantId);
 };
 
 module.exports = {
@@ -72,5 +92,8 @@ module.exports = {
 	rateEquipment,
 	favouriteEquipment,
 	removeFavouriteEquipment,
-	updateWeightStack
+	updateWeightStack,
+	getVariants,
+	createVariant,
+	deleteVariant
 };

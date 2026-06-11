@@ -98,8 +98,17 @@ const getSeriesByBrand = async (req, res) => {
 const uploadEquipmentImage = async (req, res) => {
 	try {
 		const userId = req.user?.id || null;
-		const image_url = await equipmentService.uploadEquipmentImage(req.params.id, req.file?.buffer, req.file?.mimetype, userId);
-		res.json({ data: { image_url } });
+		const result = await equipmentService.uploadEquipmentImage(req.params.id, req.file?.buffer, req.file?.mimetype, userId);
+		if (!result) return res.status(404).json({ error: 'Equipment not found' });
+		// A replacement photo is staged as pending; only then notify the contributor it's under review.
+		if (result.status === 'pending' && userId) {
+			try {
+				await createNotification(pool, userId, 'submission_received', req.params.id, 'Your equipment photo update is under review');
+			} catch (notifyErr) {
+				console.error('EQUIPMENT PHOTO NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: { image_url: result.image_url, status: result.status } });
 	} catch (err) {
 		if (err.message === 'No image provided') {
 			return res.status(400).json({ error: err.message });
@@ -150,17 +159,77 @@ const removeFavouriteEquipment = async (req, res) => {
 
 const updateWeightStack = async (req, res) => {
 	try {
+		const submittedBy = req.user?.id || null;
 		const { weight_stack } = req.body;
 		const value = weight_stack === null ? null : parseInt(weight_stack, 10);
 		if (value !== null && (isNaN(value) || value <= 0)) {
 			return res.status(400).json({ error: 'Invalid weight stack value' });
 		}
-		const result = await equipmentService.updateWeightStack(req.params.id, value);
+		const result = await equipmentService.updateWeightStack(req.params.id, value, submittedBy);
 		if (!result) return res.status(404).json({ error: 'Equipment not found or not pin loaded' });
+		if (submittedBy) {
+			try {
+				await createNotification(pool, submittedBy, 'submission_received', req.params.id, 'Your weight stack update is under review');
+			} catch (notifyErr) {
+				console.error('WEIGHT STACK NOTIFICATION ERROR:', notifyErr);
+			}
+		}
 		res.json({ data: result });
 	} catch (err) {
 		console.error('UPDATE WEIGHT STACK ERROR:', err);
 		res.status(500).json({ error: 'Failed to update weight stack' });
+	}
+};
+
+const getVariants = async (req, res) => {
+	try {
+		const variants = await equipmentService.getVariants(req.params.id);
+		res.json({ data: variants });
+	} catch (err) {
+		console.error('GET VARIANTS ERROR:', err);
+		res.status(500).json({ error: 'Failed to fetch variants' });
+	}
+};
+
+const createVariant = async (req, res) => {
+	try {
+		const createdBy = req.user?.id || null;
+		const { label, variation_type, is_default } = req.body;
+		const variant = await equipmentService.createVariant(
+			req.params.id,
+			label,
+			variation_type,
+			is_default,
+			createdBy
+		);
+		if (createdBy) {
+			try {
+				await createNotification(pool, createdBy, 'submission_received', req.params.id, 'Your variant submission is under review');
+			} catch (notifyErr) {
+				console.error('VARIANT NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.status(201).json({ data: variant });
+	} catch (err) {
+		if (
+			err.message === 'label and variation_type are required' ||
+			err.message === 'Invalid variation_type'
+		) {
+			return res.status(400).json({ error: err.message });
+		}
+		console.error('CREATE VARIANT ERROR:', err);
+		res.status(500).json({ error: 'Failed to create variant' });
+	}
+};
+
+const deleteVariant = async (req, res) => {
+	try {
+		const result = await equipmentService.deleteVariant(req.params.variantId);
+		if (!result) return res.status(404).json({ error: 'Variant not found' });
+		res.json({ data: result });
+	} catch (err) {
+		console.error('DELETE VARIANT ERROR:', err);
+		res.status(500).json({ error: 'Failed to delete variant' });
 	}
 };
 
@@ -176,5 +245,8 @@ module.exports = {
 	rateEquipment,
 	favouriteEquipment,
 	removeFavouriteEquipment,
-	updateWeightStack
+	updateWeightStack,
+	getVariants,
+	createVariant,
+	deleteVariant
 };

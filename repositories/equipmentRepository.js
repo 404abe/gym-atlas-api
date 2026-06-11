@@ -29,7 +29,19 @@ const getEquipmentById = async (id, userId = null) => {
 			e.resistance_profile,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating,
-			COALESCE(BOOL_OR(ef.user_id = $2), false) AS is_favorite
+			COALESCE(BOOL_OR(ef.user_id = $2), false) AS is_favorite,
+			COALESCE((
+				SELECT JSON_AGG(
+					JSON_BUILD_OBJECT(
+						'id', ev.id,
+						'label', ev.label,
+						'variation_type', ev.variation_type,
+						'is_default', ev.is_default
+					) ORDER BY ev.is_default DESC, ev.label ASC
+				)
+				FROM equipment_variants ev
+				WHERE ev.equipment_id = e.id AND ev.status = 'approved'
+			), '[]') AS variants
 		FROM equipment e
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
 		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
@@ -49,7 +61,19 @@ const getAllEquipment = async (userId = null) => {
 			e.resistance_profile,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating,
-			COALESCE(BOOL_OR(ef.user_id = $1), false) AS is_favorite
+			COALESCE(BOOL_OR(ef.user_id = $1), false) AS is_favorite,
+			COALESCE((
+				SELECT JSON_AGG(
+					JSON_BUILD_OBJECT(
+						'id', ev.id,
+						'label', ev.label,
+						'variation_type', ev.variation_type,
+						'is_default', ev.is_default
+					) ORDER BY ev.is_default DESC, ev.label ASC
+				)
+				FROM equipment_variants ev
+				WHERE ev.equipment_id = e.id AND ev.status = 'approved'
+			), '[]') AS variants
 		FROM equipment e
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
 		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
@@ -147,13 +171,24 @@ const getSeriesByBrand = async (brand) => {
 // 	return result.secure_url;
 // };
 
+// First photo (image_url IS NULL) goes live instantly; a replacement is staged in
+// pending_image_url and left for admin approval so the live image is never clobbered.
 const uploadEquipmentImage = async (id, fileBuffer, mimeType, userId = null) => {
 	const url = await uploadToAzure(fileBuffer, mimeType, 'equipment');
-	await pool.query(
-		'UPDATE equipment SET image_url = $1, photo_uploaded_by = $2, photo_uploaded_at = NOW(), photo_status = \'pending\' WHERE id = $3',
+	const result = await pool.query(
+		`UPDATE equipment SET
+			image_url         = CASE WHEN image_url IS NULL THEN $1 ELSE image_url END,
+			pending_image_url = CASE WHEN image_url IS NULL THEN NULL ELSE $1 END,
+			photo_status      = CASE WHEN image_url IS NULL THEN 'approved' ELSE 'pending' END,
+			photo_uploaded_by = $2,
+			photo_uploaded_at = NOW()
+		 WHERE id = $3
+		 RETURNING image_url, pending_image_url, photo_status`,
 		[url, userId, id]
 	);
-	return url;
+	const row = result.rows[0];
+	if (!row) return null;
+	return { image_url: row.image_url, status: row.photo_status };
 };
 
 const rateEquipment = async (userId, equipmentId, rating) => {
@@ -195,10 +230,43 @@ const removeFavouriteEquipment = async (userId, equipmentId) => {
 	return result.rows[0] || null;
 };
 
-const updateWeightStack = async (id, weightStack) => {
+// Weight-stack edits are submitted as pending; the live value is untouched until an admin approves.
+const updateWeightStack = async (id, weightStack, submittedBy = null) => {
 	const result = await pool.query(
-		`UPDATE equipment SET weight_stack = $1 WHERE id = $2 AND type = 'pin_loaded' RETURNING id, weight_stack`,
-		[weightStack, id]
+		`UPDATE equipment
+		 SET pending_weight_stack = $1, weight_stack_status = 'pending', weight_stack_submitted_by = $2
+		 WHERE id = $3 AND type = 'pin_loaded'
+		 RETURNING id, pending_weight_stack, weight_stack_status`,
+		[weightStack, submittedBy, id]
+	);
+	return result.rows[0] || null;
+};
+
+const getVariantsByEquipmentId = async (equipmentId) => {
+	const result = await pool.query(
+		`SELECT id, label, variation_type, is_default
+		 FROM equipment_variants
+		 WHERE equipment_id = $1 AND status = 'approved'
+		 ORDER BY is_default DESC, label ASC`,
+		[equipmentId]
+	);
+	return result.rows;
+};
+
+const createVariant = async (equipmentId, label, variationType, isDefault = false, createdBy = null) => {
+	const result = await pool.query(
+		`INSERT INTO equipment_variants (equipment_id, label, variation_type, is_default, created_by)
+		 VALUES ($1, $2, $3, $4, $5)
+		 RETURNING *`,
+		[equipmentId, label, variationType, isDefault, createdBy]
+	);
+	return result.rows[0];
+};
+
+const deleteVariant = async (variantId) => {
+	const result = await pool.query(
+		`DELETE FROM equipment_variants WHERE id = $1 RETURNING *`,
+		[variantId]
 	);
 	return result.rows[0] || null;
 };
@@ -216,5 +284,8 @@ module.exports = {
 	favouriteEquipment,
 	removeFavouriteEquipment,
 	searchEquipmentByName,
-	updateWeightStack
+	updateWeightStack,
+	getVariantsByEquipmentId,
+	createVariant,
+	deleteVariant
 };

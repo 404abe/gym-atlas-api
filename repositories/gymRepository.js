@@ -114,6 +114,23 @@ const createGym = async (
 	return result.rows[0];
 };
 
+// First photo (image_url IS NULL) goes live instantly; a replacement is staged in
+// pending_image_url and left for admin approval so the live image is never clobbered.
+const uploadGymImage = async (id, url, userId = null) => {
+	const result = await pool.query(
+		`UPDATE gyms SET
+			image_url         = CASE WHEN image_url IS NULL THEN $1 ELSE image_url END,
+			pending_image_url = CASE WHEN image_url IS NULL THEN NULL ELSE $1 END,
+			photo_status      = CASE WHEN image_url IS NULL THEN 'approved' ELSE 'pending' END,
+			photo_uploaded_by = $2,
+			photo_uploaded_at = NOW()
+		 WHERE id = $3
+		 RETURNING image_url, pending_image_url, photo_status`,
+		[url, userId, id]
+	);
+	return result.rows[0] || null;
+};
+
 const getGymEquipment = async (gymId) => {
 	const result = await pool.query(
 		`
@@ -147,7 +164,11 @@ const addGymEquipment = async (
 		`INSERT INTO gym_equipment (gym_id, equipment_id, quantity, notes, status, created_by)
          VALUES ($1, $2, $3, $4, $5, $6)
          ON CONFLICT (gym_id, equipment_id)
-         DO UPDATE SET quantity = EXCLUDED.quantity, notes = EXCLUDED.notes, status = EXCLUDED.status, created_by = EXCLUDED.created_by
+         DO UPDATE SET
+             quantity   = gym_equipment.quantity + EXCLUDED.quantity,
+             notes      = COALESCE(EXCLUDED.notes, gym_equipment.notes),
+             status     = CASE WHEN gym_equipment.status = 'approved' THEN 'approved' ELSE EXCLUDED.status END,
+             created_by = COALESCE(gym_equipment.created_by, EXCLUDED.created_by)
          RETURNING *`,
 		[gymId, equipmentId, quantity, notes, status, createdBy]
 	);
@@ -300,6 +321,7 @@ module.exports = {
 	getGyms,
 	getGymById,
 	createGym,
+	uploadGymImage,
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,
