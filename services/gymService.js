@@ -37,6 +37,20 @@ const getGymEquipment = async (gymId) => {
 	return await gymRepo.getGymEquipment(gymId);
 };
 
+// Normalises a submitted Instagram handle (strips a leading @ and any URL
+// wrapping) before staging it for review.
+const updateInstagram = async (id, instagram, submittedBy = null) => {
+	const handle = String(instagram || '')
+		.trim()
+		.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
+		.replace(/^@/, '')
+		.replace(/\/+$/, '')
+		.split(/[/?]/)[0];
+	if (!handle) throw new Error('Instagram handle is required');
+	if (!/^[A-Za-z0-9._]{1,30}$/.test(handle)) throw new Error('Invalid Instagram handle');
+	return await gymRepo.updateInstagram(id, handle, submittedBy);
+};
+
 const addGymEquipment = async (gymId, equipmentId, quantity, notes, status, createdBy) => {
 	return await gymRepo.addGymEquipment(gymId, equipmentId, quantity, notes, status, createdBy);
 };
@@ -89,6 +103,7 @@ module.exports = {
 	getGymById,
 	createGym,
 	getGymEquipment,
+	updateInstagram,
 	addGymEquipment,
 	getGymStats,
 	removeGymEquipment,
