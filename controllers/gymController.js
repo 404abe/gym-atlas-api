@@ -57,6 +57,30 @@ const createGym = async (req, res) => {
 	}
 };
 
+// PATCH /gyms/:id/instagram — suggest an Instagram handle for admin review
+const updateInstagram = async (req, res) => {
+	try {
+		const submittedBy = req.user?.id || null;
+		const { instagram } = req.body;
+		const result = await gymService.updateInstagram(req.params.id, instagram, submittedBy);
+		if (!result) return res.status(404).json({ error: 'Gym not found' });
+		if (submittedBy) {
+			try {
+				await createNotification(pool, submittedBy, 'submission_received', req.params.id, 'Your gym Instagram suggestion is under review');
+			} catch (notifyErr) {
+				console.error('GYM INSTAGRAM NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: result });
+	} catch (err) {
+		if (err.message === 'Instagram handle is required' || err.message === 'Invalid Instagram handle') {
+			return res.status(400).json({ error: err.message });
+		}
+		console.error('UPDATE GYM INSTAGRAM ERROR:', err);
+		res.status(500).json({ error: 'Failed to update Instagram' });
+	}
+};
+
 // POST /gyms/:gymId/equipment
 const addGymEquipment = async (req, res) => {
 	try {
@@ -213,6 +237,7 @@ module.exports = {
 	getGymStats,
 	removeGymEquipment,
 	createGym,
+	updateInstagram,
 	rateGym,
 	favouriteGym,
 	removeFavouriteGym,

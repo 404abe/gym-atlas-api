@@ -131,6 +131,19 @@ const uploadGymImage = async (id, url, userId = null) => {
 	return result.rows[0] || null;
 };
 
+// Stages a suggested Instagram handle for admin review; the live handle is
+// unchanged until approved. Mirrors the weight-stack review flow.
+const updateInstagram = async (id, instagram, submittedBy = null) => {
+	const result = await pool.query(
+		`UPDATE gyms
+		 SET pending_instagram = $1, instagram_status = 'pending', instagram_submitted_by = $2
+		 WHERE id = $3
+		 RETURNING id, instagram, pending_instagram, instagram_status`,
+		[instagram, submittedBy, id]
+	);
+	return result.rows[0] || null;
+};
+
 const getGymEquipment = async (gymId) => {
 	const result = await pool.query(
 		`
@@ -322,6 +335,7 @@ module.exports = {
 	getGymById,
 	createGym,
 	uploadGymImage,
+	updateInstagram,
 	getGymEquipment,
 	addGymEquipment,
 	getGymStats,

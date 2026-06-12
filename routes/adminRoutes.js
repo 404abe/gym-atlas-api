@@ -86,7 +86,16 @@ router.get('/pending', async (req, res) => {
              WHERE e.weight_stack_status = 'pending'
              ORDER BY e.id DESC`
 		);
-		res.json({ data: { gyms: gyms.rows, equipment: equipment.rows, suggestions: suggestions.rows, photos: photos.rows, gymPhotos: gymPhotos.rows, variants: variants.rows, weightStacks: weightStacks.rows } });
+		const gymInstagrams = await pool.query(
+			`SELECT g.id, g.name, g.city, g.country, g.image_url,
+                g.instagram, g.pending_instagram,
+                u.username AS submitted_by
+             FROM gyms g
+             LEFT JOIN profiles u ON u.id = g.instagram_submitted_by
+             WHERE g.instagram_status = 'pending'
+             ORDER BY g.id DESC`
+		);
+		res.json({ data: { gyms: gyms.rows, equipment: equipment.rows, suggestions: suggestions.rows, photos: photos.rows, gymPhotos: gymPhotos.rows, variants: variants.rows, weightStacks: weightStacks.rows, gymInstagrams: gymInstagrams.rows } });
 	} catch (err) {
 		console.error('GET PENDING ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch pending submissions' });
@@ -433,6 +442,60 @@ router.post('/reject/weight-stack/:id', async (req, res) => {
 	} catch (err) {
 		console.error('REJECT WEIGHT STACK ERROR:', err);
 		res.status(500).json({ error: 'Failed to reject weight stack' });
+	}
+});
+
+// POST /admin/approve/gym-instagram/:id
+router.post('/approve/gym-instagram/:id', async (req, res) => {
+	try {
+		const result = await pool.query(
+			`UPDATE gyms
+             SET instagram = pending_instagram, pending_instagram = NULL, instagram_status = 'approved'
+             WHERE id = $1 AND instagram_status = 'pending'
+             RETURNING *`,
+			[req.params.id]
+		);
+		if (!result.rows[0]) return res.status(404).json({ error: 'Pending Instagram not found' });
+
+		const gym = result.rows[0];
+		if (gym.instagram_submitted_by) {
+			try {
+				await createNotification(pool, gym.instagram_submitted_by, 'gym_approved', gym.id, 'Your gym Instagram suggestion was approved');
+			} catch (notifyErr) {
+				console.error('APPROVE GYM INSTAGRAM NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: gym });
+	} catch (err) {
+		console.error('APPROVE GYM INSTAGRAM ERROR:', err);
+		res.status(500).json({ error: 'Failed to approve Instagram' });
+	}
+});
+
+// POST /admin/reject/gym-instagram/:id
+router.post('/reject/gym-instagram/:id', async (req, res) => {
+	try {
+		const result = await pool.query(
+			`UPDATE gyms
+             SET pending_instagram = NULL, instagram_status = 'rejected'
+             WHERE id = $1 AND instagram_status = 'pending'
+             RETURNING *`,
+			[req.params.id]
+		);
+		if (!result.rows[0]) return res.status(404).json({ error: 'Pending Instagram not found' });
+
+		const gym = result.rows[0];
+		if (gym.instagram_submitted_by) {
+			try {
+				await createNotification(pool, gym.instagram_submitted_by, 'gym_rejected', gym.id, 'Your gym Instagram suggestion was not approved');
+			} catch (notifyErr) {
+				console.error('REJECT GYM INSTAGRAM NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: gym });
+	} catch (err) {
+		console.error('REJECT GYM INSTAGRAM ERROR:', err);
+		res.status(500).json({ error: 'Failed to reject Instagram' });
 	}
 });
 
