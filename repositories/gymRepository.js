@@ -154,11 +154,13 @@ const getGymEquipment = async (gymId) => {
 			e.name,
 			CONCAT_WS(' ', e.brand, e.series, e.name) AS full_name,
 			ge.quantity,
-			e.image_url
+			e.image_url,
+			ge.status
 		FROM gym_equipment ge
 		JOIN equipment e ON ge.equipment_id = e.id
-		WHERE ge.gym_id = $1 AND ge.status = 'approved'
-		ORDER BY e.brand, e.name
+		WHERE ge.gym_id = $1
+		  AND ge.status IN ('approved', 'pending')
+		ORDER BY ge.status ASC, e.brand, e.name
 		`,
 		[gymId]
 	);
