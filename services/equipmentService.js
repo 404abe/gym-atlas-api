@@ -10,9 +10,9 @@ const getEquipmentById = async (id, userId = null) => {
 	return equipment;
 };
 
-const createEquipment = async (brand, series, name, type, createdBy = null, resistanceProfile = 'constant') => {
+const createEquipment = async (brand, series, name, type, createdBy = null) => {
 	if (!brand || !name) throw new Error('brand and name are required');
-	return await equipmentRepo.createEquipment(brand, series || null, name, type || null, createdBy, resistanceProfile);
+	return await equipmentRepo.createEquipment(brand, series || null, name, type || null, createdBy);
 };
 
 const getGymsWithEquipment = async (slug) => {

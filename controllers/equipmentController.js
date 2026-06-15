@@ -29,9 +29,9 @@ const getEquipmentById = async (req, res) => {
 
 const createEquipment = async (req, res) => {
 	try {
-		const { brand, series, name, type, resistance_profile } = req.body;
+		const { brand, series, name, type } = req.body;
 		const createdBy = req.user?.id || null;
-		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy, resistance_profile);
+		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy);
 		if (createdBy) {
 			try {
 				await createNotification(pool, createdBy, 'submission_received', equipment.id, 'Your equipment submission is under review');

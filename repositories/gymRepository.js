@@ -180,7 +180,11 @@ const addGymEquipment = async (
          VALUES ($1, $2, $3, $4, $5, $6)
          ON CONFLICT (gym_id, equipment_id)
          DO UPDATE SET
-             quantity   = gym_equipment.quantity + EXCLUDED.quantity,
+             quantity   = CASE
+                              WHEN EXCLUDED.status = 'approved'
+                              THEN gym_equipment.quantity + EXCLUDED.quantity
+                              ELSE gym_equipment.quantity
+                          END,
              notes      = COALESCE(EXCLUDED.notes, gym_equipment.notes),
              status     = CASE WHEN gym_equipment.status = 'approved' THEN 'approved' ELSE EXCLUDED.status END,
              created_by = COALESCE(gym_equipment.created_by, EXCLUDED.created_by)

@@ -3,7 +3,7 @@ const pool = require('../db');
 const { uploadToAzure } = require('../config/azureStorage');
 
 // CREATE new equipment (catalog)
-const createEquipment = async (brand, series, name, type, createdBy = null, resistanceProfile = 'constant') => {
+const createEquipment = async (brand, series, name, type, createdBy = null) => {
 	const slug = `${brand}-${series || ''}-${name}`
 		.toLowerCase()
 		.replace(/[\/\\]/g, '-')
@@ -13,9 +13,9 @@ const createEquipment = async (brand, series, name, type, createdBy = null, resi
 		.replace(/^-|-$/g, '');
 
 	const result = await pool.query(
-		`INSERT INTO equipment (brand, series, name, type, slug, status, created_by, resistance_profile)
-         VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7) RETURNING *`,
-		[brand, series, name, type, slug, createdBy, resistanceProfile]
+		`INSERT INTO equipment (brand, series, name, type, slug, status, created_by)
+         VALUES ($1, $2, $3, $4, $5, 'pending', $6) RETURNING *`,
+		[brand, series, name, type, slug, createdBy]
 	);
 	return result.rows[0];
 };
@@ -26,7 +26,6 @@ const getEquipmentById = async (id, userId = null) => {
 		`
 		SELECT
 			e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
-			e.resistance_profile,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating,
 			COALESCE(BOOL_OR(ef.user_id = $2), false) AS is_favorite,
@@ -46,7 +45,7 @@ const getEquipmentById = async (id, userId = null) => {
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
 		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
 		WHERE e.id = $1
-		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile
+		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status
 		`,
 		[id, userId]
 	);
@@ -58,7 +57,6 @@ const getAllEquipment = async (userId = null) => {
 		`
 		SELECT
 			e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
-			e.resistance_profile,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating,
 			COALESCE(BOOL_OR(ef.user_id = $1), false) AS is_favorite,
@@ -78,7 +76,7 @@ const getAllEquipment = async (userId = null) => {
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
 		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
 		WHERE e.status = 'approved'
-		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile
+		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status
 		ORDER BY e.brand, e.name
 		`,
 		[userId]
