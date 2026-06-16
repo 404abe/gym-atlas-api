@@ -1,4 +1,5 @@
 const pool = require('../db');
+const { findPlaceId, fetchPlaceHours } = require('../services/placesService');
 
 const getGyms = async (userId = null) => {
 	const result = await pool.query(
@@ -111,7 +112,24 @@ const createGym = async (
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending', $9) RETURNING *`,
 		[name, slug, latitude, longitude, address, city, country, instagram, createdBy]
 	);
-	return result.rows[0];
+	const gym = result.rows[0];
+
+	try {
+		const placeId = await findPlaceId(name, latitude, longitude);
+		if (placeId) {
+			const hours = await fetchPlaceHours(placeId);
+			if (hours) {
+				await pool.query(
+					`UPDATE gyms SET opening_hours = $1, hours_updated_at = NOW() WHERE id = $2`,
+					[hours, gym.id]
+				);
+			}
+		}
+	} catch (err) {
+		console.error('createGym: Places hours lookup failed:', err.message);
+	}
+
+	return gym;
 };
 
 // First photo (image_url IS NULL) goes live instantly; a replacement is staged in
