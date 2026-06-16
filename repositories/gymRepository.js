@@ -16,7 +16,9 @@ const getGyms = async (userId = null) => {
             COALESCE(eq.unique_machines, 0)::INT AS unique_machines,
             COALESCE(ROUND(gr.avg_rating, 1), 0) AS avg_rating,
             gr.user_rating,
-            COALESCE(gf.favourites, 0)::INT AS favourites
+            COALESCE(gf.favourites, 0)::INT AS favourites,
+            g.opening_hours,
+            g.hours_updated_at
         FROM gyms g
         LEFT JOIN (
             SELECT gym_id,
@@ -67,7 +69,9 @@ const getGymById = async (id, userId = null) => {
             COALESCE(eq.unique_machines, 0)::INT AS unique_machines,
             COALESCE(ROUND(gr.avg_rating, 1), 0) AS rating,
             COALESCE(gf.favourites, 0)::INT AS favourites,
-            COALESCE(gf.is_favorite, false) AS is_favorite
+            COALESCE(gf.is_favorite, false) AS is_favorite,
+            g.opening_hours,
+            g.hours_updated_at
         FROM gyms g
         LEFT JOIN (
             SELECT gym_id,
