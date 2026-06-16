@@ -18,7 +18,16 @@ const getGyms = async (userId = null) => {
             gr.user_rating,
             COALESCE(gf.favourites, 0)::INT AS favourites,
             g.opening_hours,
-            g.hours_updated_at
+            g.hours_updated_at,
+            COALESCE((
+                SELECT json_agg(e.image_url ORDER BY ge.created_at ASC)
+                FROM gym_equipment ge
+                JOIN equipment e ON ge.equipment_id = e.id
+                WHERE ge.gym_id = g.id
+                  AND ge.status = 'approved'
+                  AND e.image_url IS NOT NULL
+                LIMIT 4
+            ), '[]') AS equipment_images
         FROM gyms g
         LEFT JOIN (
             SELECT gym_id,
@@ -71,7 +80,16 @@ const getGymById = async (id, userId = null) => {
             COALESCE(gf.favourites, 0)::INT AS favourites,
             COALESCE(gf.is_favorite, false) AS is_favorite,
             g.opening_hours,
-            g.hours_updated_at
+            g.hours_updated_at,
+            COALESCE((
+                SELECT json_agg(e.image_url ORDER BY ge.created_at ASC)
+                FROM gym_equipment ge
+                JOIN equipment e ON ge.equipment_id = e.id
+                WHERE ge.gym_id = g.id
+                  AND ge.status = 'approved'
+                  AND e.image_url IS NOT NULL
+                LIMIT 4
+            ), '[]') AS equipment_images
         FROM gyms g
         LEFT JOIN (
             SELECT gym_id,
