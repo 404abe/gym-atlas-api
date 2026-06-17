@@ -29,9 +29,9 @@ const getEquipmentById = async (req, res) => {
 
 const createEquipment = async (req, res) => {
 	try {
-		const { brand, series, name, type } = req.body;
+		const { brand, series, name, type, resistance_profile, resistance_curve } = req.body;
 		const createdBy = req.user?.id || null;
-		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy);
+		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy, resistance_profile, resistance_curve);
 		if (createdBy) {
 			try {
 				await createNotification(pool, createdBy, 'submission_received', equipment.id, 'Your equipment submission is under review');
@@ -44,8 +44,36 @@ const createEquipment = async (req, res) => {
 		if (err.message === 'brand and name are required') {
 			return res.status(400).json({ error: err.message });
 		}
+		if (
+			err.message === 'Invalid equipment type' ||
+			err.message === 'Invalid resistance profile' ||
+			err.message === 'Invalid resistance curve'
+		) {
+			return res.status(400).json({ error: err.message });
+		}
 		console.error('CREATE EQUIPMENT ERROR:', err);
 		res.status(500).json({ error: 'Failed to create equipment' });
+	}
+};
+
+const updateEquipmentDetails = async (req, res) => {
+	try {
+		const equipment = await equipmentService.updateEquipmentDetails(req.params.id, req.body);
+		res.json({ data: equipment });
+	} catch (err) {
+		if (err.message === 'Equipment not found') {
+			return res.status(404).json({ error: err.message });
+		}
+		if (
+			err.message === 'brand and name are required' ||
+			err.message === 'Invalid equipment type' ||
+			err.message === 'Invalid resistance profile' ||
+			err.message === 'Invalid resistance curve'
+		) {
+			return res.status(400).json({ error: err.message });
+		}
+		console.error('UPDATE EQUIPMENT DETAILS ERROR:', err);
+		res.status(500).json({ error: 'Failed to update equipment' });
 	}
 };
 
@@ -246,6 +274,7 @@ module.exports = {
 	favouriteEquipment,
 	removeFavouriteEquipment,
 	updateWeightStack,
+	updateEquipmentDetails,
 	getVariants,
 	createVariant,
 	deleteVariant

@@ -2,9 +2,10 @@ const pool = require('../db');
 // const cloudinary = require('../config/cloudinary'); // CLOUDINARY — commented out, using Azure
 const { uploadToAzure } = require('../config/azureStorage');
 
-// CREATE new equipment (catalog)
-const createEquipment = async (brand, series, name, type, createdBy = null) => {
-	const slug = `${brand}-${series || ''}-${name}`
+const usesDevDb = () => process.env.USE_PG_MEM === 'true';
+
+const createSlug = (brand, series, name) =>
+	`${brand}-${series || ''}-${name}`
 		.toLowerCase()
 		.replace(/[\/\\]/g, '-')
 		.replace(/[^a-z0-9-]/g, '-')
@@ -12,20 +13,54 @@ const createEquipment = async (brand, series, name, type, createdBy = null) => {
 		.replace(/-+/g, '-')
 		.replace(/^-|-$/g, '');
 
+// CREATE new equipment (catalog)
+const createEquipment = async (brand, series, name, type, createdBy = null, resistanceProfile = 'constant', resistanceCurve = null) => {
+	const slug = createSlug(brand, series, name);
+
 	const result = await pool.query(
-		`INSERT INTO equipment (brand, series, name, type, slug, status, created_by)
-         VALUES ($1, $2, $3, $4, $5, 'pending', $6) RETURNING *`,
-		[brand, series, name, type, slug, createdBy]
+		`INSERT INTO equipment (brand, series, name, type, slug, status, created_by, resistance_profile, resistance_curve)
+         VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8) RETURNING *`,
+		[brand, series, name, type, slug, createdBy, resistanceProfile, resistanceCurve ? JSON.stringify(resistanceCurve) : null]
 	);
 	return result.rows[0];
 };
 
 // Keep open for admin preview (no status filter)
 const getEquipmentById = async (id, userId = null) => {
+	if (usesDevDb()) {
+		const result = await pool.query(
+			`
+			SELECT
+				e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
+				e.resistance_profile, e.resistance_curve,
+				COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
+				MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating,
+				COALESCE(BOOL_OR(ef.user_id = $2), false) AS is_favorite
+			FROM equipment e
+			LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
+			LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
+			WHERE e.id = $1
+			GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile, e.resistance_curve
+			`,
+			[id, userId]
+		);
+		const row = result.rows[0] || null;
+		if (!row) return null;
+		const variants = await pool.query(
+			`SELECT id, label, variation_type, is_default
+			 FROM equipment_variants
+			 WHERE equipment_id = $1 AND status = 'approved'
+			 ORDER BY is_default DESC, label ASC`,
+			[id]
+		);
+		return { ...row, variants: variants.rows };
+	}
+
 	const result = await pool.query(
 		`
 		SELECT
 			e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
+			e.resistance_profile, e.resistance_curve,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating,
 			COALESCE(BOOL_OR(ef.user_id = $2), false) AS is_favorite,
@@ -45,7 +80,7 @@ const getEquipmentById = async (id, userId = null) => {
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
 		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
 		WHERE e.id = $1
-		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status
+		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile, e.resistance_curve
 		`,
 		[id, userId]
 	);
@@ -53,10 +88,32 @@ const getEquipmentById = async (id, userId = null) => {
 };
 
 const getAllEquipment = async (userId = null) => {
+	if (usesDevDb()) {
+		const result = await pool.query(
+			`
+			SELECT
+				e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
+				e.resistance_profile, e.resistance_curve,
+				COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
+				MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating,
+				COALESCE(BOOL_OR(ef.user_id = $1), false) AS is_favorite
+			FROM equipment e
+			LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
+			LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
+			WHERE e.status = 'approved'
+			GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile, e.resistance_curve
+			ORDER BY e.brand, e.name
+			`,
+			[userId]
+		);
+		return result.rows.map((row) => ({ ...row, variants: [] }));
+	}
+
 	const result = await pool.query(
 		`
 		SELECT
 			e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
+			e.resistance_profile, e.resistance_curve,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating,
 			COALESCE(BOOL_OR(ef.user_id = $1), false) AS is_favorite,
@@ -76,7 +133,7 @@ const getAllEquipment = async (userId = null) => {
 		LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
 		LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
 		WHERE e.status = 'approved'
-		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status
+		GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile, e.resistance_curve
 		ORDER BY e.brand, e.name
 		`,
 		[userId]
@@ -240,6 +297,33 @@ const updateWeightStack = async (id, weightStack, submittedBy = null) => {
 	return result.rows[0] || null;
 };
 
+const updateEquipmentDetails = async (id, fields) => {
+	const slug = createSlug(fields.brand, fields.series, fields.name);
+	const result = await pool.query(
+		`UPDATE equipment
+		 SET brand = $1,
+		     series = $2,
+		     name = $3,
+		     type = $4,
+		     resistance_profile = $5,
+		     resistance_curve = $6,
+		     slug = $7
+		 WHERE id = $8
+		 RETURNING *`,
+		[
+			fields.brand,
+			fields.series || null,
+			fields.name,
+			fields.type,
+			fields.resistance_profile,
+			fields.resistance_curve ? JSON.stringify(fields.resistance_curve) : null,
+			slug,
+			id
+		]
+	);
+	return result.rows[0] || null;
+};
+
 const getVariantsByEquipmentId = async (equipmentId) => {
 	const result = await pool.query(
 		`SELECT id, label, variation_type, is_default
@@ -283,6 +367,7 @@ module.exports = {
 	removeFavouriteEquipment,
 	searchEquipmentByName,
 	updateWeightStack,
+	updateEquipmentDetails,
 	getVariantsByEquipmentId,
 	createVariant,
 	deleteVariant

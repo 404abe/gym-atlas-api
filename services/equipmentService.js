@@ -10,9 +10,32 @@ const getEquipmentById = async (id, userId = null) => {
 	return equipment;
 };
 
-const createEquipment = async (brand, series, name, type, createdBy = null) => {
+const EQUIPMENT_TYPES = ['pin_loaded', 'plate_loaded'];
+const RESISTANCE_PROFILES = ['constant', 'ascending', 'descending', 'adjustable', 'custom'];
+
+const validateEquipmentDetails = ({ brand, series, name, type, resistance_profile, resistance_curve }) => {
 	if (!brand || !name) throw new Error('brand and name are required');
-	return await equipmentRepo.createEquipment(brand, series || null, name, type || null, createdBy);
+	if (type && !EQUIPMENT_TYPES.includes(type)) throw new Error('Invalid equipment type');
+	if (resistance_profile && !RESISTANCE_PROFILES.includes(resistance_profile)) {
+		throw new Error('Invalid resistance profile');
+	}
+	if (resistance_curve !== undefined && resistance_curve !== null) {
+		if (!Array.isArray(resistance_curve) || resistance_curve.some((value) => typeof value !== 'number')) {
+			throw new Error('Invalid resistance curve');
+		}
+	}
+};
+
+const createEquipment = async (brand, series, name, type, createdBy = null, resistanceProfile = 'constant', resistanceCurve = null) => {
+	validateEquipmentDetails({
+		brand,
+		series,
+		name,
+		type: type || 'pin_loaded',
+		resistance_profile: resistanceProfile,
+		resistance_curve: resistanceCurve
+	});
+	return await equipmentRepo.createEquipment(brand, series || null, name, type || null, createdBy, resistanceProfile, resistanceCurve);
 };
 
 const getGymsWithEquipment = async (slug) => {
@@ -60,6 +83,20 @@ const updateWeightStack = async (id, weightStack, submittedBy = null) => {
 	return await equipmentRepo.updateWeightStack(id, weightStack, submittedBy);
 };
 
+const updateEquipmentDetails = async (id, fields) => {
+	validateEquipmentDetails(fields);
+	const equipment = await equipmentRepo.updateEquipmentDetails(id, {
+		brand: fields.brand.trim(),
+		series: fields.series?.trim() || null,
+		name: fields.name.trim(),
+		type: fields.type,
+		resistance_profile: fields.resistance_profile || 'constant',
+		resistance_curve: fields.resistance_profile === 'custom' ? fields.resistance_curve || null : null
+	});
+	if (!equipment) throw new Error('Equipment not found');
+	return equipment;
+};
+
 const VARIATION_TYPES = ['grip', 'unilateral', 'incline'];
 
 const getVariants = async (equipmentId) => {
@@ -93,6 +130,7 @@ module.exports = {
 	favouriteEquipment,
 	removeFavouriteEquipment,
 	updateWeightStack,
+	updateEquipmentDetails,
 	getVariants,
 	createVariant,
 	deleteVariant

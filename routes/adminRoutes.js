@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require('../db');
 const { authMiddleware, adminMiddleware, superAdminMiddleware } = require('../middleware/auth');
 const { createNotification } = require('./notificationsRoutes');
+const equipmentController = require('../controllers/equipmentController');
 
 // All admin routes require auth + admin role
 router.use(authMiddleware, adminMiddleware);
@@ -101,6 +102,9 @@ router.get('/pending', async (req, res) => {
 		res.status(500).json({ error: 'Failed to fetch pending submissions' });
 	}
 });
+
+// PATCH /admin/equipment/:id -- direct catalog corrections by trusted admins
+router.patch('/equipment/:id', equipmentController.updateEquipmentDetails);
 
 // POST /admin/approve/gym/:id
 router.post('/approve/gym/:id', async (req, res) => {
