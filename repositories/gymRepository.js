@@ -1,7 +1,56 @@
 const pool = require('../db');
 const { findPlaceId, fetchPlaceHours } = require('../services/placesService');
 
+const usesDevDb = () => process.env.USE_PG_MEM === 'true';
+
 const getGyms = async (userId = null) => {
+	if (usesDevDb()) {
+		const result = await pool.query(
+			`
+			SELECT
+				g.id,
+				g.name,
+				g.city,
+				g.country,
+				g.image_url,
+				g.latitude AS lat,
+				g.longitude AS lng,
+				COALESCE(eq.total_equipment, 0)::INT AS total_equipment,
+				COALESCE(eq.unique_machines, 0)::INT AS unique_machines,
+				COALESCE(ROUND(gr.avg_rating, 1), 0) AS avg_rating,
+				gr.user_rating,
+				COALESCE(gf.favourites, 0)::INT AS favourites,
+				g.opening_hours,
+				g.hours_updated_at
+			FROM gyms g
+			LEFT JOIN (
+				SELECT gym_id,
+					SUM(quantity) AS total_equipment,
+					COUNT(DISTINCT equipment_id) AS unique_machines
+				FROM gym_equipment
+				WHERE status = 'approved'
+				GROUP BY gym_id
+			) eq ON eq.gym_id = g.id
+			LEFT JOIN (
+				SELECT gym_id,
+					AVG(rating) AS avg_rating,
+					MAX(CASE WHEN user_id = $1 THEN rating END) AS user_rating
+				FROM gym_ratings
+				GROUP BY gym_id
+			) gr ON gr.gym_id = g.id
+			LEFT JOIN (
+				SELECT gym_id,
+					COUNT(*) AS favourites
+				FROM gym_favourites
+				GROUP BY gym_id
+			) gf ON gf.gym_id = g.id
+			WHERE g.status = 'approved'
+			`,
+			[userId]
+		);
+		return result.rows.map((row) => ({ ...row, equipment_images: [] }));
+	}
+
 	const result = await pool.query(
 		`
         SELECT
@@ -59,6 +108,58 @@ const getGyms = async (userId = null) => {
 
 // Keep open for admin preview (no status filter)
 const getGymById = async (id, userId = null) => {
+	if (usesDevDb()) {
+		const result = await pool.query(
+			`
+			SELECT
+				g.id,
+				g.name,
+				g.slug,
+				g.address,
+				g.city,
+				g.country,
+				g.latitude AS lat,
+				g.longitude AS lng,
+				g.instagram,
+				g.image_url,
+				g.created_at,
+				g.status,
+				COALESCE(eq.total_equipment, 0)::INT AS total_equipment,
+				COALESCE(eq.unique_machines, 0)::INT AS unique_machines,
+				COALESCE(ROUND(gr.avg_rating, 1), 0) AS rating,
+				COALESCE(gf.favourites, 0)::INT AS favourites,
+				COALESCE(gf.is_favorite, false) AS is_favorite,
+				g.opening_hours,
+				g.hours_updated_at
+			FROM gyms g
+			LEFT JOIN (
+				SELECT gym_id,
+					SUM(quantity) AS total_equipment,
+					COUNT(DISTINCT equipment_id) AS unique_machines
+				FROM gym_equipment
+				GROUP BY gym_id
+			) eq ON eq.gym_id = g.id
+			LEFT JOIN (
+				SELECT gym_id,
+					AVG(rating) AS avg_rating
+				FROM gym_ratings
+				GROUP BY gym_id
+			) gr ON gr.gym_id = g.id
+			LEFT JOIN (
+				SELECT gym_id,
+					COUNT(*) AS favourites,
+					BOOL_OR(user_id = $2 AND $2 IS NOT NULL) AS is_favorite
+				FROM gym_favourites
+				GROUP BY gym_id
+			) gf ON gf.gym_id = g.id
+			WHERE g.id = $1
+			`,
+			[id, userId]
+		);
+		const row = result.rows[0] || null;
+		return row ? { ...row, equipment_images: [] } : null;
+	}
+
 	const result = await pool.query(
 		`
         SELECT 

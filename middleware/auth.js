@@ -12,14 +12,16 @@ const upsertProfile = (user) => {
 	);
 };
 
-const authMiddleware = async (req, res, next) => {
-	const authHeader = req.headers.authorization;
-	if (!authHeader) return res.status(401).json({ error: 'No token' });
+const getDevUser = () => {
+	if (!process.env.DEV_AUTH_USER_ID || process.env.NODE_ENV === 'production') return null;
+	return {
+		id: process.env.DEV_AUTH_USER_ID,
+		email: process.env.DEV_AUTH_EMAIL || 'local-admin@gymatlas.local',
+		user_metadata: { username: process.env.DEV_AUTH_USERNAME || 'notty' }
+	};
+};
 
-	const token = authHeader.split(' ')[1];
-	const { data: { user }, error } = await supabase.auth.getUser(token);
-	if (error || !user) return res.status(401).json({ error: 'Invalid token' });
-
+const attachUser = async (req, user) => {
 	await upsertProfile(user);
 
 	const { rows } = await pool.query(
@@ -33,6 +35,23 @@ const authMiddleware = async (req, res, next) => {
 		username: rows[0]?.username ?? '',
 		role: rows[0]?.role ?? 'user'
 	};
+};
+
+const authMiddleware = async (req, res, next) => {
+	const authHeader = req.headers.authorization;
+	if (!authHeader) return res.status(401).json({ error: 'No token' });
+
+	const devUser = getDevUser();
+	if (devUser) {
+		await attachUser(req, devUser);
+		return next();
+	}
+
+	const token = authHeader.split(' ')[1];
+	const { data: { user }, error } = await supabase.auth.getUser(token);
+	if (error || !user) return res.status(401).json({ error: 'Invalid token' });
+
+	await attachUser(req, user);
 
 	next();
 };
@@ -41,22 +60,17 @@ const optionalAuth = async (req, res, next) => {
 	const authHeader = req.headers.authorization;
 	if (!authHeader) return next();
 
+	const devUser = getDevUser();
+	if (devUser) {
+		await attachUser(req, devUser);
+		return next();
+	}
+
 	const token = authHeader.split(' ')[1];
 	const { data: { user }, error } = await supabase.auth.getUser(token);
 
 	if (!error && user) {
-		await upsertProfile(user);
-
-		const { rows } = await pool.query(
-			'SELECT username, role FROM profiles WHERE id = $1',
-			[user.id]
-		);
-		req.user = {
-			id: user.id,
-			email: user.email,
-			username: rows[0]?.username ?? '',
-			role: rows[0]?.role ?? 'user'
-		};
+		await attachUser(req, user);
 	}
 
 	next();

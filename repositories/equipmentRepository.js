@@ -2,6 +2,8 @@ const pool = require('../db');
 // const cloudinary = require('../config/cloudinary'); // CLOUDINARY — commented out, using Azure
 const { uploadToAzure } = require('../config/azureStorage');
 
+const usesDevDb = () => process.env.USE_PG_MEM === 'true';
+
 const createSlug = (brand, series, name) =>
 	`${brand}-${series || ''}-${name}`
 		.toLowerCase()
@@ -25,6 +27,35 @@ const createEquipment = async (brand, series, name, type, createdBy = null, resi
 
 // Keep open for admin preview (no status filter)
 const getEquipmentById = async (id, userId = null) => {
+	if (usesDevDb()) {
+		const result = await pool.query(
+			`
+			SELECT
+				e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
+				e.resistance_profile, e.resistance_curve,
+				COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
+				MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating,
+				COALESCE(BOOL_OR(ef.user_id = $2), false) AS is_favorite
+			FROM equipment e
+			LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
+			LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
+			WHERE e.id = $1
+			GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile, e.resistance_curve
+			`,
+			[id, userId]
+		);
+		const row = result.rows[0] || null;
+		if (!row) return null;
+		const variants = await pool.query(
+			`SELECT id, label, variation_type, is_default
+			 FROM equipment_variants
+			 WHERE equipment_id = $1 AND status = 'approved'
+			 ORDER BY is_default DESC, label ASC`,
+			[id]
+		);
+		return { ...row, variants: variants.rows };
+	}
+
 	const result = await pool.query(
 		`
 		SELECT
@@ -57,6 +88,27 @@ const getEquipmentById = async (id, userId = null) => {
 };
 
 const getAllEquipment = async (userId = null) => {
+	if (usesDevDb()) {
+		const result = await pool.query(
+			`
+			SELECT
+				e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
+				e.resistance_profile, e.resistance_curve,
+				COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
+				MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating,
+				COALESCE(BOOL_OR(ef.user_id = $1), false) AS is_favorite
+			FROM equipment e
+			LEFT JOIN equipment_ratings er ON er.equipment_id = e.id
+			LEFT JOIN equipment_favourites ef ON ef.equipment_id = e.id
+			WHERE e.status = 'approved'
+			GROUP BY e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status, e.resistance_profile, e.resistance_curve
+			ORDER BY e.brand, e.name
+			`,
+			[userId]
+		);
+		return result.rows.map((row) => ({ ...row, variants: [] }));
+	}
+
 	const result = await pool.query(
 		`
 		SELECT
