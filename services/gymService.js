@@ -51,6 +51,49 @@ const updateInstagram = async (id, instagram, submittedBy = null) => {
 	return await gymRepo.updateInstagram(id, handle, submittedBy);
 };
 
+const toCount = (value, field) => {
+	const number = Number(value ?? 0);
+	if (!Number.isInteger(number) || number < 0 || number > 999) {
+		throw new Error(`${field} must be a whole number between 0 and 999`);
+	}
+	return number;
+};
+
+const toOptionalKg = (value, field) => {
+	if (value === null || value === undefined || value === '') return null;
+	const number = Number(value);
+	if (!Number.isInteger(number) || number < 0 || number > 999) {
+		throw new Error(`${field} must be a whole number between 0 and 999`);
+	}
+	return number;
+};
+
+const normaliseFreeWeights = (body) => {
+	const values = {
+		dumbbell_min_kg: toOptionalKg(body.dumbbell_min_kg, 'dumbbell_min_kg'),
+		dumbbell_max_kg: toOptionalKg(body.dumbbell_max_kg, 'dumbbell_max_kg'),
+		dumbbell_racks: toCount(body.dumbbell_racks, 'dumbbell_racks'),
+		squat_racks: toCount(body.squat_racks, 'squat_racks'),
+		flat_benches: toCount(body.flat_benches, 'flat_benches'),
+		incline_benches: toCount(body.incline_benches, 'incline_benches'),
+		platforms: toCount(body.platforms, 'platforms'),
+		preacher_curl_stations: toCount(body.preacher_curl_stations, 'preacher_curl_stations')
+	};
+	if (
+		values.dumbbell_min_kg !== null &&
+		values.dumbbell_max_kg !== null &&
+		values.dumbbell_max_kg < values.dumbbell_min_kg
+	) {
+		throw new Error('dumbbell_max_kg must be greater than or equal to dumbbell_min_kg');
+	}
+	return values;
+};
+
+const submitFreeWeights = async (gymId, body, submittedBy = null) => {
+	const values = normaliseFreeWeights(body);
+	return await gymRepo.submitFreeWeights(gymId, values, submittedBy);
+};
+
 const addGymEquipment = async (gymId, equipmentId, quantity, notes, status, createdBy) => {
 	return await gymRepo.addGymEquipment(gymId, equipmentId, quantity, notes, status, createdBy);
 };
@@ -104,6 +147,7 @@ module.exports = {
 	createGym,
 	getGymEquipment,
 	updateInstagram,
+	submitFreeWeights,
 	addGymEquipment,
 	getGymStats,
 	removeGymEquipment,
