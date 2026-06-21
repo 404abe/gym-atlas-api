@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
 const pool = require('../db');
+const supabase = require('../config/supabase');
 
 const PROFILE_CACHE_TTL_MS = 60_000;
 const profileCache = new Map();
@@ -23,26 +23,29 @@ const getProfile = async (userId) => {
 	return entry;
 };
 
-const verifyToken = (token) =>
-	jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
+const verifyToken = async (token) => {
+	const { data, error } = await supabase.auth.getUser(token);
+	if (error || !data?.user) throw new Error('Invalid token');
+	return data.user;
+};
 
 const authMiddleware = async (req, res, next) => {
 	const authHeader = req.headers.authorization;
 	if (!authHeader) return res.status(401).json({ error: 'No token' });
 
 	const token = authHeader.split(' ')[1];
-	let payload;
+	let supabaseUser;
 	try {
-		payload = verifyToken(token);
+		supabaseUser = await verifyToken(token);
 	} catch {
 		return res.status(401).json({ error: 'Invalid token' });
 	}
 
-	const profile = await getProfile(payload.sub);
+	const profile = await getProfile(supabaseUser.id);
 
 	req.user = {
-		id: payload.sub,
-		email: payload.email,
+		id: supabaseUser.id,
+		email: supabaseUser.email,
 		username: profile.username,
 		role: profile.role
 	};
@@ -55,17 +58,17 @@ const optionalAuth = async (req, res, next) => {
 	if (!authHeader) return next();
 
 	const token = authHeader.split(' ')[1];
-	let payload;
+	let supabaseUser;
 	try {
-		payload = verifyToken(token);
+		supabaseUser = await verifyToken(token);
 	} catch {
 		return next();
 	}
 
-	const profile = await getProfile(payload.sub);
+	const profile = await getProfile(supabaseUser.id);
 	req.user = {
-		id: payload.sub,
-		email: payload.email,
+		id: supabaseUser.id,
+		email: supabaseUser.email,
 		username: profile.username,
 		role: profile.role
 	};
