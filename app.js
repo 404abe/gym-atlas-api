@@ -9,6 +9,7 @@ const userRoutes = require('./routes/userRoutes');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const { router: notificationsRoutes } = require('./routes/notificationsRoutes');
 const bestInClassRoutes = require('./routes/bestInClassRoutes');
+const brandRoutes = require('./routes/brandRoutes');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/equipment', equipmentRoutes);
 app.use('/users', userRoutes);
 app.use('/notifications', notificationsRoutes);
 app.use('/best-in-class', bestInClassRoutes);
+app.use('/brands', brandRoutes);
 
 app.use((req, res) => {
 	res.status(404).json({ error: 'Route not found' });

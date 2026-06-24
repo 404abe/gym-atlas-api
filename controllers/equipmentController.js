@@ -29,9 +29,9 @@ const getEquipmentById = async (req, res) => {
 
 const createEquipment = async (req, res) => {
 	try {
-		const { brand, series, name, type } = req.body;
+		const { brand, series, name, type, brand_id } = req.body;
 		const createdBy = req.user?.id || null;
-		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy);
+		const equipment = await equipmentService.createEquipment(brand, series, name, type, createdBy, brand_id || null);
 		if (createdBy) {
 			try {
 				await createNotification(pool, createdBy, 'submission_received', equipment.id, 'Your equipment submission is under review');
@@ -92,6 +92,20 @@ const getSeriesByBrand = async (req, res) => {
 		}
 		console.error('GET SERIES ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch series' });
+	}
+};
+
+const checkDuplicate = async (req, res) => {
+	try {
+		const { brandId, series, name } = req.query;
+		const match = await equipmentService.checkDuplicate(parseInt(brandId, 10), series, name);
+		res.json({ data: { match: match || null } });
+	} catch (err) {
+		if (err.message === 'brandId and name are required') {
+			return res.status(400).json({ error: err.message });
+		}
+		console.error('CHECK DUPLICATE ERROR:', err);
+		res.status(500).json({ error: 'Failed to check for duplicates' });
 	}
 };
 
@@ -241,6 +255,7 @@ module.exports = {
 	searchEquipment,
 	getBrands,
 	getSeriesByBrand,
+	checkDuplicate,
 	uploadEquipmentImage,
 	rateEquipment,
 	favouriteEquipment,
