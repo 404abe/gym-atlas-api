@@ -5,21 +5,44 @@ const pool = require('../db');
 router.get('/', async (req, res) => {
 	try {
 		const result = await pool.query(`
+            WITH gym_counts AS (
+                SELECT created_by AS user_id, COUNT(*) AS cnt
+                FROM gyms
+                WHERE status = 'approved' AND created_by IS NOT NULL
+                GROUP BY created_by
+            ),
+            equipment_counts AS (
+                SELECT created_by AS user_id, COUNT(*) AS cnt
+                FROM equipment
+                WHERE status = 'approved' AND created_by IS NOT NULL
+                GROUP BY created_by
+            ),
+            link_counts AS (
+                SELECT created_by AS user_id, COUNT(*) AS cnt
+                FROM gym_equipment
+                WHERE status = 'approved' AND created_by IS NOT NULL
+                GROUP BY created_by
+            ),
+            photo_counts AS (
+                SELECT photo_uploaded_by AS user_id, COUNT(*) AS cnt
+                FROM equipment
+                WHERE status = 'approved' AND photo_status = 'approved' AND photo_uploaded_by IS NOT NULL
+                GROUP BY photo_uploaded_by
+            )
             SELECT
                 u.id,
                 u.username,
-                COUNT(DISTINCT g.id) AS gyms_added,
-                COUNT(DISTINCT e.id) AS equipment_added,
-                COUNT(DISTINCT ge.id) AS equipment_linked,
-                COUNT(DISTINCT ep.id) AS photos_added,
-                (COUNT(DISTINCT g.id) + COUNT(DISTINCT e.id) + COUNT(DISTINCT ge.id) + COUNT(DISTINCT ep.id)) AS total_contributions
+                COALESCE(gc.cnt, 0) AS gyms_added,
+                COALESCE(ec.cnt, 0) AS equipment_added,
+                COALESCE(lc.cnt, 0) AS equipment_linked,
+                COALESCE(pc.cnt, 0) AS photos_added,
+                (COALESCE(gc.cnt, 0) + COALESCE(ec.cnt, 0) + COALESCE(lc.cnt, 0) + COALESCE(pc.cnt, 0)) AS total_contributions
             FROM profiles u
-            LEFT JOIN gyms g ON g.created_by = u.id AND g.status = 'approved'
-            LEFT JOIN equipment e ON e.created_by = u.id AND e.status = 'approved'
-            LEFT JOIN gym_equipment ge ON ge.created_by = u.id AND ge.status = 'approved'
-            LEFT JOIN equipment ep ON ep.photo_uploaded_by = u.id AND ep.status = 'approved' AND ep.photo_status = 'approved'
-            GROUP BY u.id, u.username
-            HAVING COUNT(DISTINCT g.id) + COUNT(DISTINCT e.id) + COUNT(DISTINCT ge.id) + COUNT(DISTINCT ep.id) > 0
+            LEFT JOIN gym_counts gc ON gc.user_id = u.id
+            LEFT JOIN equipment_counts ec ON ec.user_id = u.id
+            LEFT JOIN link_counts lc ON lc.user_id = u.id
+            LEFT JOIN photo_counts pc ON pc.user_id = u.id
+            WHERE COALESCE(gc.cnt, 0) + COALESCE(ec.cnt, 0) + COALESCE(lc.cnt, 0) + COALESCE(pc.cnt, 0) > 0
             ORDER BY total_contributions DESC
             LIMIT 100
         `);
