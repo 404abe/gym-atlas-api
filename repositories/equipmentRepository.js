@@ -3,7 +3,16 @@ const pool = require('../db');
 const { uploadToAzure } = require('../config/azureStorage');
 
 // CREATE new equipment (catalog)
-const createEquipment = async (brand, series, name, type, createdBy = null, brandId = null) => {
+const createEquipment = async (
+	brand,
+	series,
+	name,
+	type,
+	createdBy = null,
+	brandId = null,
+	exerciseId = null,
+	secondaryExerciseId = null
+) => {
 	const slug = `${brand}-${series || ''}-${name}`
 		.toLowerCase()
 		.replace(/[\/\\]/g, '-')
@@ -13,9 +22,9 @@ const createEquipment = async (brand, series, name, type, createdBy = null, bran
 		.replace(/^-|-$/g, '');
 
 	const result = await pool.query(
-		`INSERT INTO equipment (brand, brand_id, series, name, type, slug, status, created_by)
-         VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7) RETURNING *`,
-		[brand, brandId, series, name, type, slug, createdBy]
+		`INSERT INTO equipment (brand, brand_id, series, name, type, slug, status, created_by, exercise_id, secondary_exercise_id)
+         VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8, $9) RETURNING *`,
+		[brand, brandId, series, name, type, slug, createdBy, exerciseId, secondaryExerciseId]
 	);
 	return result.rows[0];
 };
