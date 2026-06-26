@@ -95,7 +95,20 @@ router.get('/pending', async (req, res) => {
              WHERE g.instagram_status = 'pending'
              ORDER BY g.id DESC`
 		);
-		res.json({ data: { gyms: gyms.rows, equipment: equipment.rows, suggestions: suggestions.rows, photos: photos.rows, gymPhotos: gymPhotos.rows, variants: variants.rows, weightStacks: weightStacks.rows, gymInstagrams: gymInstagrams.rows } });
+		const freeWeights = await pool.query(
+			`SELECT f.*,
+                g.name AS gym_name,
+                g.city,
+                g.country,
+                g.image_url,
+                u.username AS submitted_by
+             FROM gym_free_weight_suggestions f
+             JOIN gyms g ON g.id = f.gym_id
+             LEFT JOIN profiles u ON u.id = f.submitted_by
+             WHERE f.status = 'pending'
+             ORDER BY f.created_at DESC`
+		);
+		res.json({ data: { gyms: gyms.rows, equipment: equipment.rows, suggestions: suggestions.rows, photos: photos.rows, gymPhotos: gymPhotos.rows, variants: variants.rows, weightStacks: weightStacks.rows, gymInstagrams: gymInstagrams.rows, freeWeights: freeWeights.rows } });
 	} catch (err) {
 		console.error('GET PENDING ERROR:', err);
 		res.status(500).json({ error: 'Failed to fetch pending submissions' });
@@ -500,6 +513,103 @@ router.post('/reject/gym-instagram/:id', async (req, res) => {
 });
 
 // POST /admin/make-admin/:userId — super_admin only; promotes a user → admin
+// POST /admin/approve/free-weights/:id
+router.post('/approve/free-weights/:id', async (req, res) => {
+	try {
+		const pending = await pool.query(
+			`UPDATE gym_free_weight_suggestions
+             SET status = 'approved'
+             WHERE id = $1 AND status = 'pending'
+             RETURNING *`,
+			[req.params.id]
+		);
+		if (!pending.rows[0]) return res.status(404).json({ error: 'Pending free weights update not found' });
+
+		const item = pending.rows[0];
+		const approved = await pool.query(
+			`INSERT INTO gym_free_weights (
+                gym_id,
+                dumbbell_min_kg,
+                dumbbell_max_kg,
+                dumbbell_racks,
+                squat_racks,
+                flat_benches,
+                incline_benches,
+                platforms,
+                preacher_curl_stations,
+                verified,
+                updated_by
+             )
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true, $10)
+             ON CONFLICT (gym_id)
+             DO UPDATE SET
+                dumbbell_min_kg = EXCLUDED.dumbbell_min_kg,
+                dumbbell_max_kg = EXCLUDED.dumbbell_max_kg,
+                dumbbell_racks = EXCLUDED.dumbbell_racks,
+                squat_racks = EXCLUDED.squat_racks,
+                flat_benches = EXCLUDED.flat_benches,
+                incline_benches = EXCLUDED.incline_benches,
+                platforms = EXCLUDED.platforms,
+                preacher_curl_stations = EXCLUDED.preacher_curl_stations,
+                verified = true,
+                updated_by = EXCLUDED.updated_by,
+                updated_at = NOW()
+             RETURNING *`,
+			[
+				item.gym_id,
+				item.dumbbell_min_kg,
+				item.dumbbell_max_kg,
+				item.dumbbell_racks,
+				item.squat_racks,
+				item.flat_benches,
+				item.incline_benches,
+				item.platforms,
+				item.preacher_curl_stations,
+				req.user.id
+			]
+		);
+
+		if (item.submitted_by) {
+			try {
+				await createNotification(pool, item.submitted_by, 'gym_approved', item.gym_id, 'Your free weights update was approved');
+			} catch (notifyErr) {
+				console.error('APPROVE FREE WEIGHTS NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: approved.rows[0] });
+	} catch (err) {
+		console.error('APPROVE FREE WEIGHTS ERROR:', err);
+		res.status(500).json({ error: 'Failed to approve free weights update' });
+	}
+});
+
+// POST /admin/reject/free-weights/:id
+router.post('/reject/free-weights/:id', async (req, res) => {
+	try {
+		const result = await pool.query(
+			`UPDATE gym_free_weight_suggestions
+             SET status = 'rejected'
+             WHERE id = $1 AND status = 'pending'
+             RETURNING *`,
+			[req.params.id]
+		);
+		if (!result.rows[0]) return res.status(404).json({ error: 'Pending free weights update not found' });
+
+		const item = result.rows[0];
+		if (item.submitted_by) {
+			try {
+				await createNotification(pool, item.submitted_by, 'gym_rejected', item.gym_id, 'Your free weights update was not approved');
+			} catch (notifyErr) {
+				console.error('REJECT FREE WEIGHTS NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: item });
+	} catch (err) {
+		console.error('REJECT FREE WEIGHTS ERROR:', err);
+		res.status(500).json({ error: 'Failed to reject free weights update' });
+	}
+});
+
 router.post('/make-admin/:userId', superAdminMiddleware, async (req, res) => {
 	try {
 		// Guard on role = 'user' so this can never silently downgrade a super_admin to admin.

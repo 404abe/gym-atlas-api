@@ -139,7 +139,29 @@ const getGymById = async (req, res) => {
 	const userId = req.user?.id || null;
 	const gym = await gymRepo.getGymById(req.params.id, userId);
 	if (!gym) return res.status(404).json({ error: 'Gym not found' });
-	res.json({ data: gym });
+	const freeWeights = await gymRepo.getFreeWeights(req.params.id);
+	res.json({ data: { ...gym, free_weights: freeWeights } });
+};
+
+const submitFreeWeights = async (req, res) => {
+	try {
+		const submittedBy = req.user?.id || null;
+		const result = await gymService.submitFreeWeights(req.params.id, req.body, submittedBy);
+		if (submittedBy) {
+			try {
+				await createNotification(pool, submittedBy, 'submission_received', req.params.id, 'Your free weights update is under review');
+			} catch (notifyErr) {
+				console.error('FREE WEIGHTS NOTIFICATION ERROR:', notifyErr);
+			}
+		}
+		res.json({ data: result });
+	} catch (err) {
+		if (err.message?.includes('must be') || err.message?.includes('greater than')) {
+			return res.status(400).json({ error: err.message });
+		}
+		console.error('SUBMIT FREE WEIGHTS ERROR:', err);
+		res.status(500).json({ error: 'Failed to submit free weights' });
+	}
 };
 const rateGym = async (req, res) => {
 	try {
@@ -238,6 +260,7 @@ module.exports = {
 	removeGymEquipment,
 	createGym,
 	updateInstagram,
+	submitFreeWeights,
 	rateGym,
 	favouriteGym,
 	removeFavouriteGym,

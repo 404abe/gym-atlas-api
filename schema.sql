@@ -151,6 +151,58 @@ ALTER TABLE ONLY public.gym_equipment ADD CONSTRAINT gym_equipment_pkey PRIMARY 
 ALTER TABLE ONLY public.gym_equipment ADD CONSTRAINT gym_equipment_gym_id_equipment_id_key UNIQUE (gym_id, equipment_id);
 
 -- =============================================
+-- gym_free_weights
+-- =============================================
+
+CREATE TABLE public.gym_free_weights (
+    gym_id integer NOT NULL,
+    dumbbell_min_kg integer,
+    dumbbell_max_kg integer,
+    dumbbell_racks integer NOT NULL DEFAULT 0,
+    squat_racks integer NOT NULL DEFAULT 0,
+    flat_benches integer NOT NULL DEFAULT 0,
+    incline_benches integer NOT NULL DEFAULT 0,
+    platforms integer NOT NULL DEFAULT 0,
+    preacher_curl_stations integer NOT NULL DEFAULT 0,
+    verified boolean NOT NULL DEFAULT false,
+    updated_at timestamp without time zone DEFAULT now(),
+    updated_by UUID
+);
+
+ALTER TABLE public.gym_free_weights OWNER TO postgres;
+ALTER TABLE ONLY public.gym_free_weights ADD CONSTRAINT gym_free_weights_pkey PRIMARY KEY (gym_id);
+
+-- =============================================
+-- gym_free_weight_suggestions
+-- =============================================
+
+CREATE TABLE public.gym_free_weight_suggestions (
+    id integer NOT NULL,
+    gym_id integer NOT NULL,
+    dumbbell_min_kg integer,
+    dumbbell_max_kg integer,
+    dumbbell_racks integer NOT NULL DEFAULT 0,
+    squat_racks integer NOT NULL DEFAULT 0,
+    flat_benches integer NOT NULL DEFAULT 0,
+    incline_benches integer NOT NULL DEFAULT 0,
+    platforms integer NOT NULL DEFAULT 0,
+    preacher_curl_stations integer NOT NULL DEFAULT 0,
+    status text NOT NULL DEFAULT 'pending'::text,
+    submitted_by UUID,
+    created_at timestamp without time zone DEFAULT now()
+);
+
+ALTER TABLE public.gym_free_weight_suggestions OWNER TO postgres;
+
+CREATE SEQUENCE public.gym_free_weight_suggestions_id_seq
+    AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
+
+ALTER SEQUENCE public.gym_free_weight_suggestions_id_seq OWNER TO postgres;
+ALTER SEQUENCE public.gym_free_weight_suggestions_id_seq OWNED BY public.gym_free_weight_suggestions.id;
+ALTER TABLE ONLY public.gym_free_weight_suggestions ALTER COLUMN id SET DEFAULT nextval('public.gym_free_weight_suggestions_id_seq'::regclass);
+ALTER TABLE ONLY public.gym_free_weight_suggestions ADD CONSTRAINT gym_free_weight_suggestions_pkey PRIMARY KEY (id);
+
+-- =============================================
 -- gym_favourites
 -- =============================================
 
