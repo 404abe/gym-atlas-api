@@ -120,7 +120,8 @@ const checkDuplicate = async (req, res) => {
 const uploadEquipmentImage = async (req, res) => {
 	try {
 		const userId = req.user?.id || null;
-		const result = await equipmentService.uploadEquipmentImage(req.params.id, req.file?.buffer, req.file?.mimetype, userId);
+		const isAdmin = req.user?.role === 'admin' || req.user?.role === 'super_admin';
+		const result = await equipmentService.uploadEquipmentImage(req.params.id, req.file?.buffer, req.file?.mimetype, userId, isAdmin);
 		if (!result) return res.status(404).json({ error: 'Equipment not found' });
 		// A replacement photo is staged as pending; only then notify the contributor it's under review.
 		if (result.status === 'pending' && userId) {

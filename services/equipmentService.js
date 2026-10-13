@@ -59,9 +59,9 @@ const checkDuplicate = async (brandId, series, name) => {
 	return await equipmentRepo.checkDuplicate(brandId, series || null, name);
 };
 
-const uploadEquipmentImage = async (id, fileBuffer, mimeType, userId = null) => {
+const uploadEquipmentImage = async (id, fileBuffer, mimeType, userId = null, applyDirectly = false) => {
 	if (!fileBuffer) throw new Error('No image provided');
-	return await equipmentRepo.uploadEquipmentImage(id, fileBuffer, mimeType, userId);
+	return await equipmentRepo.uploadEquipmentImage(id, fileBuffer, mimeType, userId, applyDirectly);
 };
 
 const rateEquipment = async (userId, equipmentId, rating) => {

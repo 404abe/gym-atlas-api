@@ -37,9 +37,9 @@ const getGymEquipment = async (gymId) => {
 	return await gymRepo.getGymEquipment(gymId);
 };
 
-const uploadGymImage = async (id, fileBuffer, mimeType, userId = null) => {
+const uploadGymImage = async (id, fileBuffer, mimeType, userId = null, applyDirectly = false) => {
 	if (!fileBuffer) throw new Error('No image provided');
-	return await gymRepo.uploadGymImage(id, fileBuffer, mimeType, userId);
+	return await gymRepo.uploadGymImage(id, fileBuffer, mimeType, userId, applyDirectly);
 };
 
 // Normalises a submitted Instagram handle (strips a leading @ and any URL

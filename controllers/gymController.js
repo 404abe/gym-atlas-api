@@ -164,7 +164,8 @@ const uploadGymImage = async (req, res) => {
 	try {
 		if (!req.file) return res.status(400).json({ error: 'No image provided' });
 		const userId = req.user?.id || null;
-		const result = await gymService.uploadGymImage(req.params.id, req.file.buffer, req.file.mimetype, userId);
+		const isAdmin = req.user?.role === 'admin' || req.user?.role === 'super_admin';
+		const result = await gymService.uploadGymImage(req.params.id, req.file.buffer, req.file.mimetype, userId, isAdmin);
 		if (!result) return res.status(404).json({ error: 'Gym not found' });
 
 		if (result.photo_status === 'pending' && userId) {

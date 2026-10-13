@@ -208,18 +208,19 @@ const checkDuplicate = async (brandId, series, name) => {
 
 // First photo (image_url IS NULL) goes live instantly; a replacement is staged in
 // pending_image_url and left for admin approval so the live image is never clobbered.
-const uploadEquipmentImage = async (id, fileBuffer, mimeType, userId = null) => {
+// applyDirectly (admins, who could approve it themselves) skips the queue.
+const uploadEquipmentImage = async (id, fileBuffer, mimeType, userId = null, applyDirectly = false) => {
 	const url = await uploadToCloudinary(fileBuffer, mimeType, 'equipment');
 	const result = await pool.query(
 		`UPDATE equipment SET
-			image_url         = CASE WHEN image_url IS NULL THEN $1 ELSE image_url END,
-			pending_image_url = CASE WHEN image_url IS NULL THEN NULL ELSE $1 END,
-			photo_status      = CASE WHEN image_url IS NULL THEN 'approved' ELSE 'pending' END,
+			image_url         = CASE WHEN image_url IS NULL OR $4::boolean THEN $1 ELSE image_url END,
+			pending_image_url = CASE WHEN image_url IS NULL OR $4::boolean THEN NULL ELSE $1 END,
+			photo_status      = CASE WHEN image_url IS NULL OR $4::boolean THEN 'approved' ELSE 'pending' END,
 			photo_uploaded_by = $2,
 			photo_uploaded_at = NOW()
 		 WHERE id = $3
 		 RETURNING image_url, pending_image_url, photo_status`,
-		[url, userId, id]
+		[url, userId, id, applyDirectly]
 	);
 	const row = result.rows[0];
 	if (!row) return null;
