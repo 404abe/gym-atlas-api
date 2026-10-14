@@ -28,7 +28,8 @@ const getEquipmentById = async (req, res) => {
 
 const createEquipment = async (req, res) => {
 	try {
-		const { brand, series, name, type, brand_id, exercise_id, secondary_exercise_id } = req.body;
+		const { brand, series, name, type, brand_id, exercise_id, secondary_exercise_id,
+			resistance_profile, resistance_curve } = req.body;
 		const createdBy = req.user?.id || null;
 		const equipment = await equipmentService.createEquipment(
 			brand,
@@ -38,7 +39,9 @@ const createEquipment = async (req, res) => {
 			createdBy,
 			brand_id || null,
 			exercise_id || null,
-			secondary_exercise_id || null
+			secondary_exercise_id || null,
+			resistance_profile ?? 'constant',
+			resistance_curve ?? null
 		);
 		if (createdBy) {
 			try {
@@ -49,7 +52,7 @@ const createEquipment = async (req, res) => {
 		}
 		res.status(201).json({ data: equipment });
 	} catch (err) {
-		if (err.message === 'brand and name are required') {
+		if (/required|Invalid/.test(err.message)) {
 			return res.status(400).json({ error: err.message });
 		}
 		console.error('CREATE EQUIPMENT ERROR:', err);

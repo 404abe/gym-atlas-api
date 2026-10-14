@@ -19,14 +19,17 @@ const createEquipment = async (
 	createdBy = null,
 	brandId = null,
 	exerciseId = null,
-	secondaryExerciseId = null
+	secondaryExerciseId = null,
+	resistanceProfile = 'constant',
+	resistanceCurve = null
 ) => {
 	const slug = buildSlug(brand, series, name);
 
 	const result = await pool.query(
-		`INSERT INTO equipment (brand, brand_id, series, name, type, slug, status, created_by, exercise_id, secondary_exercise_id)
-         VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8, $9) RETURNING *`,
-		[brand, brandId, series, name, type, slug, createdBy, exerciseId, secondaryExerciseId]
+		`INSERT INTO equipment (brand, brand_id, series, name, type, slug, status, created_by, exercise_id, secondary_exercise_id, resistance_profile, resistance_curve)
+         VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8, $9, $10, $11) RETURNING *`,
+		[brand, brandId, series, name, type, slug, createdBy, exerciseId, secondaryExerciseId,
+			resistanceProfile, resistanceCurve ? JSON.stringify(resistanceCurve) : null]
 	);
 	return result.rows[0];
 };
@@ -37,6 +40,7 @@ const getEquipmentById = async (id, userId = null) => {
 		`
 		SELECT
 			e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
+			e.resistance_profile, e.resistance_curve,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $2 THEN er.rating END) AS user_rating,
 			COALESCE(BOOL_OR(ef.user_id = $2), false) AS is_favorite,
@@ -74,6 +78,7 @@ const getAllEquipment = async (userId = null) => {
 		`
 		SELECT
 			e.id, e.brand, e.series, e.name, e.slug, e.type, e.weight_stack, e.created_at, e.image_url, e.status,
+			e.resistance_profile, e.resistance_curve,
 			COALESCE(ROUND(AVG(er.rating), 1), 0) AS avg_rating,
 			MAX(CASE WHEN er.user_id = $1 THEN er.rating END) AS user_rating,
 			COALESCE(BOOL_OR(ef.user_id = $1), false) AS is_favorite,

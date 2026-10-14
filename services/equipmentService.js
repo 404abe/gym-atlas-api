@@ -18,9 +18,12 @@ const createEquipment = async (
 	createdBy = null,
 	brandId = null,
 	exerciseId = null,
-	secondaryExerciseId = null
+	secondaryExerciseId = null,
+	resistanceProfile = 'constant',
+	resistanceCurve = null
 ) => {
 	if (!brand || !name) throw new Error('brand and name are required');
+	validateResistance(resistanceProfile, resistanceCurve);
 	return await equipmentRepo.createEquipment(
 		brand,
 		series || null,
@@ -29,7 +32,9 @@ const createEquipment = async (
 		createdBy,
 		brandId,
 		exerciseId,
-		secondaryExerciseId
+		secondaryExerciseId,
+		resistanceProfile,
+		resistanceProfile === 'custom' ? resistanceCurve : null
 	);
 };
 
@@ -85,15 +90,22 @@ const updateWeightStack = async (id, weightStack, submittedBy = null) => {
 
 const RESISTANCE_PROFILES = ['constant', 'ascending', 'descending', 'adjustable', 'custom'];
 
+const validateResistance = (profile, curve) => {
+	if (profile != null && !RESISTANCE_PROFILES.includes(profile)) {
+		throw new Error('Invalid resistance_profile');
+	}
+	if (curve != null && (!Array.isArray(curve) || curve.some(value => !Number.isFinite(value)))) {
+		throw new Error('Invalid resistance_curve');
+	}
+};
+
 const updateEquipment = async (id, fields) => {
 	const { brand, name, type, resistanceProfile } = fields;
 	if (!brand || !name) throw new Error('brand and name are required');
 	if (type && !['pin_loaded', 'plate_loaded'].includes(type)) {
 		throw new Error('Invalid type');
 	}
-	if (resistanceProfile && !RESISTANCE_PROFILES.includes(resistanceProfile)) {
-		throw new Error('Invalid resistance_profile');
-	}
+	validateResistance(resistanceProfile, fields.resistanceCurve);
 	return await equipmentRepo.updateEquipment(id, fields);
 };
 
